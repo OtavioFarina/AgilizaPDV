@@ -66,11 +66,40 @@ try {
             $produto_sabor = $produto_info['sabor'];
             $produto_tipo = $produto_info['nome_categoria'];
             
-            // --- REGISTRA A SAÍDA NO ESTOQUE (Sem alteração) ---
-            $stmtSaidaEstoque = $conn->prepare(
-                "INSERT INTO estoque (movimentacao, produto, sabor, tipo, estoque_atual, data) 
-                 VALUES ('Saída', :produto, :sabor, :tipo, :quantidade, NOW())"
-            );
+            // --- REGISTRA A SAÍDA NO ESTOQUE ---
+            // Verifica o saldo atual
+            $stmtSaldo = $conn->prepare("
+                SELECT COALESCE(
+                    SUM(CASE 
+                        WHEN movimentacao = 'Entrada' THEN estoque_atual 
+                        WHEN movimentacao = 'Saída' THEN -estoque_atual 
+                    END), 0
+                ) as saldo
+                FROM estoque 
+                WHERE produto = :produto 
+                AND sabor = :sabor 
+                AND tipo = :tipo
+            ");
+            
+            $stmtSaldo->execute([
+                ':produto' => $produto_nome,
+                ':sabor' => $produto_sabor,
+                ':tipo' => $produto_tipo
+            ]);
+            
+            $saldo_atual = (int)$stmtSaldo->fetchColumn();
+            
+            // Verifica se há estoque suficiente
+            if ($saldo_atual < $quantidade_vendida) {
+                throw new Exception("Estoque insuficiente para o produto $produto_nome - $produto_sabor (Disponível: $saldo_atual, Solicitado: $quantidade_vendida)");
+            }
+            
+            // Registra a saída no estoque com a quantidade NEGATIVA
+            $stmtSaidaEstoque = $conn->prepare("
+                INSERT INTO estoque (movimentacao, produto, sabor, tipo, estoque_atual, data) 
+                VALUES ('Saída', :produto, :sabor, :tipo, :quantidade, NOW())
+            ");
+            
             $stmtSaidaEstoque->execute([
                 ':produto' => $produto_nome,
                 ':sabor' => $produto_sabor,
@@ -126,17 +155,6 @@ try {
             // --------------------------------------------------------------------------------
             
         }
-
-            // Atualiza a quantidade do produto no estoque
-        $sqlAtualizaEstoque = "UPDATE estoque SET estoque_atual = estoque_atual - :quantidade 
-                              WHERE produto = :produto AND sabor = :sabor AND tipo = :tipo";
-        $stmtAtualizaEstoque = $conn->prepare($sqlAtualizaEstoque);
-        $stmtAtualizaEstoque->execute([
-            ':produto' => $produto_nome,
-            ':sabor' => $produto_sabor,
-            ':tipo' => $produto_tipo,
-            ':quantidade' => $quantidade_vendida
-        ]);
 
             // Inserção em 'saida_produtos' (Sem alteração)
         $sqlItem = "INSERT INTO saida_produtos (venda_id, id_produto, quantidade, data, processado) 

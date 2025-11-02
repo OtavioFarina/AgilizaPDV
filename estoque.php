@@ -60,15 +60,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_categoria'])) {
 // --- CONSULTA PRINCIPAL DO ESTOQUE ---
 $sql = "
     SELECT 
-        produto, sabor, tipo,
-        SUM(CASE WHEN movimentacao = 'Entrada' THEN estoque_atual ELSE 0 END) -
-        SUM(CASE WHEN movimentacao = 'Saída' THEN estoque_atual ELSE 0 END) AS estoque_final,
-        MAX(valor_custo) AS valor_custo,
-        MAX(data) AS ultima_data
-    FROM estoque
-    GROUP BY produto, sabor, tipo
+        e.produto,
+        e.sabor,
+        e.tipo,
+        COALESCE(
+            SUM(CASE 
+                WHEN e.movimentacao = 'Entrada' THEN e.estoque_atual 
+                WHEN e.movimentacao = 'Saída' THEN -e.estoque_atual 
+            END), 0
+        ) as estoque_final,
+        MAX(e.valor_custo) as valor_custo,
+        MAX(e.data) as ultima_data
+    FROM estoque e
+    GROUP BY e.produto, e.sabor, e.tipo
     HAVING estoque_final > 0
-    ORDER BY produto, sabor
+    ORDER BY e.produto, e.sabor
 ";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
