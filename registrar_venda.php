@@ -127,7 +127,18 @@ try {
             
         }
 
-        // Inserção em 'saida_produtos' (Sem alteração)
+            // Atualiza a quantidade do produto no estoque
+        $sqlAtualizaEstoque = "UPDATE estoque SET estoque_atual = estoque_atual - :quantidade 
+                              WHERE produto = :produto AND sabor = :sabor AND tipo = :tipo";
+        $stmtAtualizaEstoque = $conn->prepare($sqlAtualizaEstoque);
+        $stmtAtualizaEstoque->execute([
+            ':produto' => $produto_nome,
+            ':sabor' => $produto_sabor,
+            ':tipo' => $produto_tipo,
+            ':quantidade' => $quantidade_vendida
+        ]);
+
+            // Inserção em 'saida_produtos' (Sem alteração)
         $sqlItem = "INSERT INTO saida_produtos (venda_id, id_produto, quantidade, data, processado) 
                     VALUES (:venda_id, :id_produto, :quantidade, NOW(), 1)";
         $stmtItem = $conn->prepare($sqlItem);
