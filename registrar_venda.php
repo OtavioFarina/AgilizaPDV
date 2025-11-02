@@ -1,9 +1,14 @@
 <?php
 require_once "conexao.php";
 
+// 🚨 CONFIGURAÇÃO DO WEBHOOK 🚨
+// MUDAR: Substitua esta URL pelo Webhook Address do seu nó n8n
+$WEBHOOK_URL = 'https://teste.automaticbot.pro/webhook-test/94354dcd-32b9-4e30-9a88-e9b6083746eb'; 
+$ESTOQUE_MINIMO = 5; // Gatilho: <= 5 unidades
+
 header('Content-Type: application/json');
 
-// ... (verificação de caixa aberto continua a mesma) ...
+// --- VERIFICAÇÃO DE CAIXA ABERTO ---
 $sqlStatus = "SELECT status FROM caixa_status ORDER BY id_status DESC LIMIT 1";
 $stmtStatus = $conn->prepare($sqlStatus);
 $stmtStatus->execute();
@@ -24,9 +29,9 @@ if (!$dados || empty($dados['itens'])) {
 try {
     $conn->beginTransaction();
 
-    // Inserção da venda (continua igual)
+    // Inserção da venda (Sem alteração)
     $sqlVenda = "INSERT INTO vendas (data_hora, valor_total, id_forma_pagamento, status) VALUES (NOW(), :total, :id_forma_pagamento, 'finalizada')";
-    // ... (lógica para pegar o id_forma_pagamento continua a mesma) ...
+    
     $forma_pagamento_nome = trim($dados['forma_pagamento']);
     $stmtPag = $conn->prepare("SELECT id_forma_pagamento FROM forma_pagamento WHERE nome_pagamento = :nome");
     $stmtPag->execute([':nome' => $forma_pagamento_nome]);
@@ -46,8 +51,7 @@ try {
         if ($quantidade_vendida <= 0)
             continue;
 
-        // --- MUDANÇA PRINCIPAL AQUI ---
-        // Agora, além do nome e sabor, também buscamos a CATEGORIA do produto
+        // --- BUSCA INFORMAÇÕES DO PRODUTO (Sem alteração) ---
         $stmtProdutoInfo = $conn->prepare("
             SELECT p.nome, p.sabor, c.nome_categoria 
             FROM produto p 
@@ -58,20 +62,72 @@ try {
         $produto_info = $stmtProdutoInfo->fetch(PDO::FETCH_ASSOC);
 
         if ($produto_info) {
-            // Agora inserimos o registro de SAÍDA com a categoria correta
+            $produto_nome = $produto_info['nome'];
+            $produto_sabor = $produto_info['sabor'];
+            $produto_tipo = $produto_info['nome_categoria'];
+            
+            // --- REGISTRA A SAÍDA NO ESTOQUE (Sem alteração) ---
             $stmtSaidaEstoque = $conn->prepare(
                 "INSERT INTO estoque (movimentacao, produto, sabor, tipo, estoque_atual, data) 
                  VALUES ('Saída', :produto, :sabor, :tipo, :quantidade, NOW())"
             );
             $stmtSaidaEstoque->execute([
-                ':produto' => $produto_info['nome'],
-                ':sabor' => $produto_info['sabor'],
-                ':tipo' => $produto_info['nome_categoria'], // <<< A CORREÇÃO
+                ':produto' => $produto_nome,
+                ':sabor' => $produto_sabor,
+                ':tipo' => $produto_tipo,
                 ':quantidade' => $quantidade_vendida
             ]);
+
+            // --------------------------------------------------------------------------------
+            // 🌟 CÓDIGO INSERIDO PARA VERIFICAR ESTOQUE E DISPARAR O WEBHOOK N8N 
+            // --------------------------------------------------------------------------------
+
+            // 1. Recalcula o estoque atual do item após a movimentação de SAÍDA/VENDA.
+            $stmtEstoque = $conn->prepare("
+                SELECT 
+                    SUM(CASE WHEN movimentacao = 'Entrada' THEN estoque_atual ELSE 0 END) -
+                    SUM(CASE WHEN movimentacao = 'Saída' THEN estoque_atual ELSE 0 END) AS estoque_final
+                FROM estoque
+                WHERE produto = ? AND sabor = ? AND tipo = ?
+                GROUP BY produto, sabor, tipo
+            ");
+            $stmtEstoque->execute([$produto_nome, $produto_sabor, $produto_tipo]); 
+            $resultado = $stmtEstoque->fetch(PDO::FETCH_ASSOC);
+            $estoque_final = $resultado ? (int) $resultado['estoque_final'] : 0;
+
+            // 2. Verifica a condição de "Estoque Baixo" (<= 5)
+            if ($estoque_final <= $ESTOQUE_MINIMO) {
+                // 3. Prepara o payload (JSON) para o Webhook
+                $payload = json_encode([
+                    'produto' => $produto_nome,
+                    'sabor' => $produto_sabor,
+                    'categoria' => $produto_tipo,
+                    'estoque_atual' => $estoque_final,
+                    'data_alerta' => date('Y-m-d H:i:s')
+                ]);
+
+                // 4. Dispara a requisição HTTP (POST) para o n8n (Não bloqueante)
+                $ch = curl_init($WEBHOOK_URL);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($payload)
+                ]);
+                
+                // CRÍTICO: Configurações para garantir que a requisição não bloqueie o checkout
+                curl_setopt($ch, CURLOPT_TIMEOUT, 1); 
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1); // Timeout de conexão
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Apenas se houver problemas de certificado
+                curl_exec($ch);
+                curl_close($ch);
+            }
+            // --------------------------------------------------------------------------------
+            
         }
 
-        // Inserção em 'saida_produtos' (continua igual)
+        // Inserção em 'saida_produtos' (Sem alteração)
         $sqlItem = "INSERT INTO saida_produtos (venda_id, id_produto, quantidade, data, processado) 
                     VALUES (:venda_id, :id_produto, :quantidade, NOW(), 1)";
         $stmtItem = $conn->prepare($sqlItem);
