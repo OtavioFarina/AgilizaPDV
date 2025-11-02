@@ -1,0 +1,79 @@
+:root {
+  --primary-blue: #4682b4;
+  --background-light: #f8f9fa;
+  --white: #ffffff;
+  --text-color: #212529;
+  --border-color: #dee2e6;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --border-radius: 0.75rem;
+}
+
+body {
+  background-color: var(--primary-blue);
+  font-family: "Roboto", sans-serif;
+  color: var(--text-color);
+}
+
+.top-bar {
+  background-color: var(--white);
+  box-shadow: var(--shadow);
+  padding: 0.75rem 1.5rem;
+}
+
+.top-bar img.logo {
+  height: 50px;
+}
+
+.main-container {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  margin: 7rem auto;
+  max-width: 900px;
+  box-shadow: var(--shadow);
+}
+
+.main-container h1,
+.main-container h2 {
+  color: var(--primary-blue);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-card {
+  background-color: var(--background-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.table {
+  border-color: var(--border-color);
+  vertical-align: middle;
+}
+
+.table thead {
+  background-color: var(--background-light);
+}
+
+.table > thead > tr > th {
+  color: var(--primary-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.table td,
+.table th {
+  color: var(--text-color);
+}
+
+.table-hover tbody tr:hover {
+  background-color: #eef5ff;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: var(--background-light);
+}

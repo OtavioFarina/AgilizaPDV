@@ -1,0 +1,38 @@
+:root {
+    --primary-blue: #4682B4;
+    --background-light: #f8f9fa;
+    --white: #ffffff;
+    --text-color: #212529;
+    --border-color: #dee2e6;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --border-radius: 0.75rem;
+}
+
+body {
+    background-color: var(--primary-blue);
+    font-family: 'Roboto', sans-serif;
+}
+
+.top-bar {
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.main-container {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    box-shadow: var(--shadow);
+}
+
+.form-card {
+    background-color: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e9ecef;
+}

@@ -1,0 +1,7 @@
+LOGIN:
+
+VendedorSR
+1234
+
+ VendedorCS
+12345
