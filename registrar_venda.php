@@ -3,7 +3,7 @@ require_once "conexao.php";
 
 // 🚨 CONFIGURAÇÃO DO WEBHOOK 🚨
 // MUDAR: Substitua esta URL pelo Webhook Address do seu nó n8n
-$WEBHOOK_URL = 'https://teste.automaticbot.pro/webhook-test/94354dcd-32b9-4e30-9a88-e9b6083746eb'; 
+$WEBHOOK_URL = 'https://webhook.automaticbot.pro/webhook/94354dcd-32b9-4e30-9a88-e9b6083746eb'; 
 $ESTOQUE_MINIMO = 5; // Gatilho: <= 5 unidades
 
 header('Content-Type: application/json');
