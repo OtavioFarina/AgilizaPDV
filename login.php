@@ -9,22 +9,28 @@ if (isset($_POST['bt_login'])) {
         $senha = $_POST['senha'];
 
         try {
+            // 1. Busca os dados corretos (id, tipo, nome, senha)
             $consulta = $conn->prepare("SELECT id_usuario, tipo_usuario, nome_usuario, senha FROM usuarios WHERE nome_usuario = :nome_usuario");
             $consulta->bindValue(':nome_usuario', $nome_usuario);
             $consulta->execute();
             $row = $consulta->fetch(PDO::FETCH_ASSOC);
 
             if ($row && password_verify($senha, $row['senha'])) {
+                // 2. Salva na sessão
                 $_SESSION['id_usuario'] = $row['id_usuario'];
-                $_SESSION['tipo_usuario'] = $row['tipo_usuario'];
+                $_SESSION['tipo_usuario'] = $row['tipo_usuario']; // Salva o tipo ('admin' ou 'vendedor')
                 $_SESSION['nome_usuario'] = $row['nome_usuario'];
 
-                if ($row['tipo'] == 1) {
-                    // Se 'tipo' for 1, é um ADMINISTRADOR.
+                // 3. VERIFICAÇÃO CORRIGIDA
+                // Note que agora usamos $row['tipo_usuario'], igual está no banco
+                
+                // Verifica se é ADM (tipo_usuario = 1)
+                if ($row['tipo_usuario'] == 1) { 
+                    // É ADMINISTRADOR -> Vai para o painel completo
                     header("Location: adm.php");
                     exit();
                 } else {
-                    // Se 'tipo' for 0 (ou qualquer outro valor), é um USUÁRIO COMUM.
+                    // É VENDEDOR -> Vai para a tela de vendas
                     header("Location: vendas.php");
                     exit();
                 }

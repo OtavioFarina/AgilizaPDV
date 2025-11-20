@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Proteção: Usuário deve estar logado
+if (!isset($_SESSION['id_usuario'])) {
+    header("Location: acesso.php");
+    exit();
+}
+
 include "conexao.php";
 
 $sqlStatus = "SELECT status FROM caixa_status ORDER BY id_status DESC LIMIT 1";
@@ -51,7 +59,15 @@ foreach ($produtos as $p) {
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalToggle">Status Caixa</a></li>
                 <li><a class="dropdown-item" href="estoque.php">Estoque</a></li>
-                <li><a class="dropdown-item" href="adm.php">Painel Administrativo</a></li>
+                <?php if ($_SESSION['tipo_usuario'] == 1): ?>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="adm.php" style="color: red; font-weight: bold;">⚙️ Painel Administrativo</a></li>
+                <li><a class="dropdown-item" href="cad_produto.php" style="color: red;">📦 Cadastro de Produtos</a></li>
+                <li><a class="dropdown-item" href="cad_categoria.php" style="color: red;">🏷️ Cadastro de Categorias</a></li>
+                <li><a class="dropdown-item" href="cad_usuario.php" style="color: red;">👥 Cadastro de Usuários</a></li>
+                <?php endif; ?>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="acesso.php">Logout</a></li>
             </ul>
         </div>
     </header>
