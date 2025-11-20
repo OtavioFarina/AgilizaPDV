@@ -3,5 +3,5 @@ LOGIN:
 VendedorSR
 1234
 
- VendedorCS
+VendedorCS // ADM
 12345
