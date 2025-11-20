@@ -89,9 +89,11 @@ foreach ($dadosGrafico as $dado) {
       <button class="btn" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         <img src="img/3riscos.png" alt="Menu" style="height:25px;">
       </button>
-      <ul class="dropdown-menu dropdown-menu-end">
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
         <li><a class="dropdown-item" href="vendas.php">Ir para o PDV</a></li>
-        <li><a class="dropdown-item text-danger" href="acesso.php">Sair</a></li>
+        <li><a class="dropdown-item" href="estoque.php">Gestão de Estoque</a></li>
+        <li><a class="dropdown-item" href="consulta_caixa.php">Relatório de Caixa</a></li>
+        <li><a class="dropdown-item" href="logout.php">Sair da Conta</a></li>
       </ul>
     </div>
   </div>
