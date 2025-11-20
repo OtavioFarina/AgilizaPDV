@@ -1,5 +1,4 @@
 <?php
-<<<<<<< HEAD
 session_start();
 
 // Proteção: Só ADM pode acessar
@@ -7,8 +6,7 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['tipo_usuario'] != 1) {
     header("Location: vendas.php");
     exit();
 }
-?>
-=======
+
 require_once "conexao.php";
 
 // Definir fuso horário para garantir datas corretas
@@ -73,9 +71,7 @@ foreach ($dadosGrafico as $dado) {
   $valoresGrafico[] = $dado['total'];
 }
 ?>
-
->>>>>>> 3cc106aa8c01dcd07255b4c17d2a5aa3daed70ce
-<!DOCTYPE html>
+<!DOCTYPE html>>
 <html lang="pt-br">
 
 <head>
