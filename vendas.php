@@ -49,9 +49,9 @@ foreach ($produtos as $p) {
                 <img src="img/3riscos.png" class="menu-icon" alt="Menu">
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalToggle">Status
-                        Caixa</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalToggle">Status Caixa</a></li>
                 <li><a class="dropdown-item" href="estoque.php">Estoque</a></li>
+                <li><a class="dropdown-item" href="adm.php">Painel Administrativo</a></li>
             </ul>
         </div>
     </header>
