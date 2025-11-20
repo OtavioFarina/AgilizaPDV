@@ -39,17 +39,19 @@ foreach ($produtos as $p) {
         <img src="img/logo pdv.png" class="logo" alt="Logo PDV">
         <div class="caixa-status-indicator">
             <?php if ($caixa_status === 'aberto'): ?>
-                <span class="badge bg-success">✔️ CAIXA ABERTO</span>
+                <span class="badge bg-success">CAIXA ABERTO</span>
             <?php else: ?>
-                <span class="badge bg-danger">❌ CAIXA FECHADO</span>
+                <span class="badge bg-danger">CAIXA FECHADO</span>
             <?php endif; ?>
         </div>
         <div class="dropdown">
+            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModalToggle">
+                Abrir/Fechar Caixa
+            </button>
             <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="img/3riscos.png" class="menu-icon" alt="Menu">
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalToggle">Status Caixa</a></li>
                 <li><a class="dropdown-item" href="estoque.php">Estoque</a></li>
                 <li><a class="dropdown-item" href="adm.php">Painel Administrativo</a></li>
             </ul>
