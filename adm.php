@@ -24,6 +24,7 @@
         <li><a class="dropdown-item" href="vendas.php">Vendas (PDV)</a></li>
         <li><a class="dropdown-item" href="estoque.php">Gestão de Estoque</a></li>
         <li><a class="dropdown-item" href="consulta_caixa.php">Relatório de Caixa</a></li>
+        <li><a class="dropdown-item" href="login.php">Sair da Conta</a></li>
       </ul>
     </div>
   </div>

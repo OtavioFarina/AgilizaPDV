@@ -23,7 +23,7 @@ if (isset($_POST['bt_login'])) {
                     // Se 'tipo' for 1, é um ADMINISTRADOR.
                     header("Location: adm.php");
                     exit();
-                } else {
+                } elseif ($row['tipo'] == 0) {
                     // Se 'tipo' for 0 (ou qualquer outro valor), é um USUÁRIO COMUM.
                     header("Location: vendas.php");
                     exit();

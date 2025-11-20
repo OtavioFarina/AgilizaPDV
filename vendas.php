@@ -51,7 +51,7 @@ foreach ($produtos as $p) {
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalToggle">Status Caixa</a></li>
                 <li><a class="dropdown-item" href="estoque.php">Estoque</a></li>
-                <li><a class="dropdown-item" href="adm.php">Painel Administrativo</a></li>
+                <li><a class="dropdown-item" href="login.php">Sair da Conta</a></li>
             </ul>
         </div>
     </header>
