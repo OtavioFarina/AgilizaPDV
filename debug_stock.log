@@ -1,6 +1,0 @@
-2025-11-02 22:25:37 - Venda: produto=Bebida; sabor=Água com Gás; tipo=Bebida; qtd_vendida=1; saldo_antes=465
-2025-11-02 22:25:37 - Pós-venda: produto=Bebida; saldo_depois=464
-2025-11-02 22:25:56 - Venda: produto=Bebida; sabor=Água com Gás; tipo=Bebida; qtd_vendida=1; saldo_antes=464
-2025-11-02 22:25:56 - Pós-venda: produto=Bebida; saldo_depois=463
-2025-11-02 22:26:26 - Venda: produto=Bebida; sabor=Água com Gás; tipo=Bebida; qtd_vendida=10; saldo_antes=463
-2025-11-02 22:26:26 - Pós-venda: produto=Bebida; saldo_depois=453

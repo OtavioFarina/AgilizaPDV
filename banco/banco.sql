@@ -48,14 +48,24 @@ INSERT INTO `caixa_status` (`id_status`, `status`, `valor_inicial`, `data_status
 (3, 'aberto', 100.00, '2025-11-22 15:21:58'),
 (4, 'fechado', 0.00, '2025-11-22 15:23:59');
 
--- --------------------------------------------------------
+DROP TABLE IF EXISTS `estabelecimento`;
+CREATE TABLE `estabelecimento` (
+  `id_estabelecimento` int NOT NULL AUTO_INCREMENT,
+  `nome_estabelecimento` varchar(100) NOT NULL,
+  `cep` varchar(255) NOT NULL,
+  `rua` varchar(255) NOT NULL,
+  `bairro` varchar(255) NOT NULL,
+  `cidade` varchar(120) NOT NULL,
+  `estado` char(2) NOT NULL,
+  PRIMARY KEY (`id_estabelecimento`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Estrutura para tabela `categoria`
 --
 
 DROP TABLE IF EXISTS `categoria`;
-CREATE TABLE IF NOT EXISTS `categoria` (
+CREATE TABLE `categoria` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
   `nome_categoria` varchar(100) NOT NULL,
   PRIMARY KEY (`id_categoria`)
@@ -281,7 +291,7 @@ INSERT INTO `forma_pagamento` (`id_forma_pagamento`, `nome_pagamento`) VALUES
 --
 
 DROP TABLE IF EXISTS `fornecedor`;
-CREATE TABLE IF NOT EXISTS `fornecedor` (
+CREATE TABLE `fornecedor` (
   `id_fornecedor` int NOT NULL AUTO_INCREMENT,
   `nome_fornecedor` varchar(120) NOT NULL,
   `cnpj` varchar(255) NOT NULL,
@@ -295,7 +305,7 @@ CREATE TABLE IF NOT EXISTS `fornecedor` (
 -- Despejando dados para a tabela `fornecedor`
 --
 
-INSERT INTO `fornecedor` (`id_fornecedor`, `nome_fornecedor`, `cnpj`, `telefone`, `email`, `endereco`) VALUES
+INSERT INTO `fornecedor` VALUES
 (1, 'Rogério', '75.793.400/0001-09', '(13) 2483-9745', 'rogerio@hotmail.com', 'Litora'),
 (2, 'Francisco Parra', '75.616.214/0001-96', '(19) 29017-7648', 'parrafrancisco@gmail.com', 'Sorocaba');
 
@@ -306,7 +316,7 @@ INSERT INTO `fornecedor` (`id_fornecedor`, `nome_fornecedor`, `cnpj`, `telefone`
 --
 
 DROP TABLE IF EXISTS `produto`;
-CREATE TABLE IF NOT EXISTS `produto` (
+CREATE TABLE `produto` (
   `id_produto` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(50) NOT NULL,
   `sabor` varchar(50) NOT NULL,
@@ -467,6 +477,4 @@ ALTER TABLE `usuarios`
   ADD CONSTRAINT `fk_usuario_estabelecimento` FOREIGN KEY (`id_estabelecimento`) REFERENCES `estabelecimento` (`id_estabelecimento`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+SET FOREIGN_KEY_CHECKS=1;
