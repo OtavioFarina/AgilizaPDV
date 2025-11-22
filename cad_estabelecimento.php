@@ -1,186 +1,203 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['nome_usuario']) || (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] != 1)) {
+  header("Location: acesso.php");
+  exit();
+}
+
+require_once "conexao.php";
+$mensagem_swal = "";
+
+try {
+  if (isset($_POST["cadastrar"])) {
+    $nome = $_POST["nome_estabelecimento"];
+    $cep = $_POST["cep"];
+
+    // Busca endereço via PHP (Backend) ou confia no JS? 
+    // Para garantir, vamos usar os campos hidden ou preenchidos que o JS populou
+    // Mas aqui no seu código original você usava a API no PHP. Vou manter o PHP para ser robusto.
+    $rua = "";
+    $bairro = "";
+    $cidade = "";
+    $estado = "";
+    $url = "https://viacep.com.br/ws/$cep/json/";
+    $response = @file_get_contents($url);
+    if ($response) {
+      $data = json_decode($response, true);
+      if (isset($data['logradouro'])) {
+        $rua = $data['logradouro'];
+        $bairro = $data['bairro'];
+        $cidade = $data['localidade'];
+        $estado = $data['uf'];
+      }
+    }
+
+    $sql = $conn->prepare("INSERT INTO estabelecimento (nome_estabelecimento, cep, rua, bairro, cidade, estado) VALUES (:nome, :cep, :rua, :bairro, :cid, :est)");
+    $sql->execute([':nome' => $nome, ':cep' => $cep, ':rua' => $rua, ':bairro' => $bairro, ':cid' => $cidade, ':est' => $estado]);
+
+    $mensagem_swal = "Swal.fire({ icon: 'success', title: 'Sucesso!', text: 'Estabelecimento cadastrado.', showConfirmButton: false, timer: 1500 });";
+  }
+
+  if (isset($_GET['ex'])) {
+    $id = $_GET['ex'];
+    $conn->prepare("DELETE FROM estabelecimento WHERE id_estabelecimento = ?")->execute([$id]);
+    header("Location: cad_estabelecimento.php?msg=excluido");
+    exit();
+  }
+
+  if (isset($_GET['msg']) && $_GET['msg'] == 'excluido') {
+    $mensagem_swal = "Swal.fire({ icon: 'success', title: 'Excluído!', text: 'Loja removida.', timer: 2000, showConfirmButton: false });";
+  }
+
+} catch (PDOException $erro) {
+  $mensagem_swal = "Swal.fire({ icon: 'error', title: 'Erro!', text: '" . $erro->getMessage() . "' });";
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDV - Cadastro de Estabelecimento</title>
-
+  <title>PDV - Lojas</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
   <link href="styles/style_cad.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
-
-  <div class="top-bar d-flex align-items-center justify-content-between px-3 py-2 bg-light rounded shadow-sm">
-    <img src="img/logo pdv.png" class="logo" alt="Logo PDV" style="height:50px;">
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-3">
+      <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo">
+      <h5 class="m-0 fw-bold text-secondary d-none d-md-block">Administrativo</h5>
+    </div>
     <div class="dropdown">
-      <button class="btn dropdown" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="img/3riscos.png" class="3riscos" alt="Simbolo3Riscos" style="height:25px;">
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
+      <button class="btn btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown"><i
+          class='bx bx-menu fs-3'></i></button>
+      <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+        <li><a class="dropdown-item py-2" href="adm.php"><i class='bx bxs-dashboard'></i> Voltar ao Painel</a></li>
         <li>
-          <a class="dropdown-item" href="adm.php">Painel Administrativo</a>
+          <hr class="dropdown-divider">
         </li>
+        <li><a class="dropdown-item py-2 text-danger" href="logout.php"><i class='bx bx-log-out'></i> Sair</a></li>
       </ul>
     </div>
   </div>
 
   <div class="main-container">
-    <h1 class="text-center mb-4">Cadastro de Estabelecimento</h1>
+    <h2 class="page-title"><i class='bx bx-store-alt'></i> Gerenciar Lojas</h2>
 
-    <?php
-    require "conexao.php";
+    <div class="form-card">
+      <h5 class="mb-4 text-primary fw-bold">Novo Estabelecimento</h5>
+      <form method="post">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Nome da Loja</label>
+            <input type="text" class="form-control" name="nome_estabelecimento" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">CEP</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="cep" name="cep" required>
+              <button class="btn btn-outline-secondary" type="button" id="btnBuscarCep"><i
+                  class='bx bx-search'></i></button>
+            </div>
+          </div>
 
-    if (isset($_GET['ex'])) {
-      $id_estabelecimento_excluir = $_GET['ex'];
+          <!-- Campos de Endereço (Bloqueados apenas para visualização, o PHP busca de novo no server) -->
+          <div class="col-md-6">
+            <label class="form-label">Rua</label>
+            <input type="text" class="form-control bg-light" id="rua" readonly>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Bairro</label>
+            <input type="text" class="form-control bg-light" id="bairro" readonly>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Cidade/UF</label>
+            <input type="text" class="form-control bg-light" id="cidade" readonly>
+          </div>
 
-      try {
-        $sql = $conn->prepare("DELETE FROM estabelecimento WHERE id_estabelecimento = :id_estabelecimento");
-        $sql->bindParam(':id_estabelecimento', $id_estabelecimento_excluir);
-        $sql->execute();
-
-        header("Location: cad_estabelecimento.php");
-        exit();
-      } catch (PDOException $e) {
-        echo "<div class='alert alert-danger'>Erro ao excluir: " . htmlspecialchars($e->getMessage()) . "</div>";
-      }
-    }
-
-    if (isset($_POST["cadastrar"])) {
-      $nome_estabelecimento = $_POST["nome_estabelecimento"];
-      $cep = $_POST["cep"];
-
-      $rua = "";
-      $bairro = "";
-      $cidade = "";
-      $estado = "";
-
-      $url = "https://viacep.com.br/ws/$cep/json/";
-      $response = @file_get_contents($url);
-
-      if ($response) {
-        $addressData = json_decode($response, true);
-        if (isset($addressData['logradouro'])) {
-          $rua = $addressData['logradouro'];
-          $bairro = $addressData['bairro'] ?? '';
-          $cidade = $addressData['localidade'] ?? '';
-          $estado = $addressData['uf'] ?? '';
-        }
-      }
-
-      try {
-        $sql = $conn->prepare("INSERT INTO estabelecimento (nome_estabelecimento, cep, rua, bairro, cidade, estado) 
-                           VALUES (:nome_estabelecimento, :cep, :rua, :bairro, :cidade, :estado)");
-
-        $sql->bindValue(':nome_estabelecimento', $nome_estabelecimento);
-        $sql->bindValue(':cep', $cep);
-        $sql->bindValue(':rua', $rua);
-        $sql->bindValue(':bairro', $bairro);
-        $sql->bindValue(':cidade', $cidade);
-        $sql->bindValue(':estado', $estado);
-
-        $sql->execute();
-
-        echo "<div class='alert alert-success'>Cadastro realizado com sucesso!</div>";
-      } catch (PDOException $erro) {
-        echo "<div class='alert alert-danger'>Erro: " . htmlspecialchars($erro->getMessage()) . "</div>";
-      }
-    }
-    ?>
-
-    <form name="form1" method="post" action="">
-      <div class="row">
-        <div class="col-sm-12 mt-3">
-          <label for="nome_estabelecimento" class="form-label">Nome do Estabelecimento</label>
-          <input type="text" class="form-control" id="nome_estabelecimento" name="nome_estabelecimento" required>
+          <div class="col-12 mt-4">
+            <button type="submit" name="cadastrar" class="btn btn-primary w-100 btn-lg"><i class='bx bx-save'></i>
+              Salvar Loja</button>
+          </div>
         </div>
+      </form>
+    </div>
 
-        <div class="col-sm-12 mt-3">
-          <label for="cep" class="form-label">CEP</label>
-          <input type="text" class="form-control" id="cep" name="cep" required>
-        </div>
-
-        <div class="col-12 mt-3">
-          <button type="submit" name="cadastrar" class="btn btn-light w-100">Cadastrar Estabelecimento</button>
-        </div>
-      </div>
-    </form>
-
-    <script>
-      document.getElementById('cep').addEventListener('input', function(event) {
-        let cep = event.target.value.replace(/\D/g, '');
-        if (cep.length > 5) {
-          cep = cep.replace(/^(\d{5})(\d)/, '$1-$2');
-        }
-        event.target.value = cep;
-      });
-
-      document.getElementById('cep').addEventListener('blur', function() {
-        const cep = this.value.replace(/\D/g, '');
-
-        if (cep.length === 8) {
-          fetch(`https://viacep.com.br/ws/${cep}/json/`)
-            .then(response => response.json())
-            .then(data => {
-              if (!data.erro) {
-                document.getElementById('rua').value = data.logradouro;
-                document.getElementById('bairro').value = data.bairro;
-                document.getElementById('cidade').value = data.localidade;
-                document.getElementById('estado').value = data.uf;
-              } else {
-                alert("CEP não encontrado.");
-              }
-            })
-            .catch(error => console.error('Erro ao buscar CEP:', error));
-        }
-      });
-    </script>
-
-    <?php
-    try {
-      $usuarios = $conn->query("SELECT * FROM estabelecimento");
-    } catch (PDOException $e) {
-      echo "<div class='alert alert-danger'>Erro ao buscar usuários: " . htmlspecialchars($e->getMessage()) . "</div>";
-    }
-    ?>
+    <?php $lojas = $conn->query("SELECT * FROM estabelecimento"); ?>
 
     <div class="table-container">
-      <h2 class="text-center mb-4">Estabelecimentos Cadastrados</h2>
-
-      <table class="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Estabelecimento</th>
-            <th>CEP</th>
-            <th>Rua</th>
-            <th>Bairro</th>
-            <th>Cidade</th>
-            <th>Estado</th>
-            <th>Alterar</th>
-            <th>Excluir</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php while ($usuario = $usuarios->fetch(PDO::FETCH_ASSOC)) : ?>
+      <h5 class="mb-4 text-secondary fw-bold">Lojas Cadastradas</h5>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
             <tr>
-              <td><?php echo htmlspecialchars($usuario['nome_estabelecimento']); ?></td>
-              <td><?php echo htmlspecialchars($usuario['cep']); ?></td>
-              <td><?php echo htmlspecialchars($usuario['rua']); ?></td>
-              <td><?php echo htmlspecialchars($usuario['bairro']); ?></td>
-              <td><?php echo htmlspecialchars($usuario['cidade']); ?></td>
-              <td><?php echo htmlspecialchars($usuario['estado']); ?></td>
-              <td><a href="alt_estabelecimento.php?al=<?php echo $usuario["id_estabelecimento"]; ?>"><img src="img/caneta.png" alt="Editar" width="40"></a></td>
-              <td><a href="cad_usuario.php?ex=<?php echo $usuario["id_estabelecimento"]; ?>" onclick="return confirm('Tem certeza que deseja excluir este estabelecimento?')"><img src="img/apagar.png" alt="Excluir" width="40">
-                </a>
-              </td>
+              <th>Loja</th>
+              <th>Endereço</th>
+              <th>Localidade</th>
+              <th class="text-center">Ações</th>
             </tr>
-          <?php endwhile; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php while ($row = $lojas->fetch(PDO::FETCH_ASSOC)): ?>
+              <tr>
+                <td class="fw-bold text-dark"><?= htmlspecialchars($row['nome_estabelecimento']); ?></td>
+                <td class="text-muted small">
+                  <?= htmlspecialchars($row['rua']); ?>, <?= htmlspecialchars($row['bairro']); ?> <br>
+                  CEP: <?= htmlspecialchars($row['cep']); ?>
+                </td>
+                <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($row['cidade']); ?> -
+                    <?= htmlspecialchars($row['estado']); ?></span></td>
+                <td class="text-center">
+                  <a href="alt_estabelecimento.php?al=<?= $row["id_estabelecimento"]; ?>"
+                    class="btn btn-sm btn-outline-primary border-0"><i class='bx bx-edit-alt fs-5'></i></a>
+                  <a href="#" onclick="confirmarExclusao(<?= $row['id_estabelecimento']; ?>)"
+                    class="btn btn-sm btn-outline-danger border-0"><i class='bx bx-trash fs-5'></i></a>
+                </td>
+              </tr>
+            <?php endwhile; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    <?php if (!empty($mensagem_swal))
+      echo $mensagem_swal; ?>
+    function confirmarExclusao(id) {
+      Swal.fire({ title: 'Tem certeza?', text: "A loja será removida.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6' }).then((result) => { if (result.isConfirmed) window.location.href = `?ex=${id}`; })
+    }
+
+    // Script de CEP (Visual Frontend)
+    const cepInput = document.getElementById('cep');
+    cepInput.addEventListener('input', (e) => {
+      let v = e.target.value.replace(/\D/g, "");
+      v = v.replace(/^(\d{5})(\d)/, "$1-$2");
+      e.target.value = v.slice(0, 9);
+    });
+    cepInput.addEventListener('blur', () => {
+      const cep = cepInput.value.replace(/\D/g, '');
+      if (cep.length === 8) {
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+          .then(res => res.json())
+          .then(data => {
+            if (!data.erro) {
+              document.getElementById('rua').value = data.logradouro;
+              document.getElementById('bairro').value = data.bairro;
+              document.getElementById('cidade').value = `${data.localidade} / ${data.uf}`;
+            }
+          });
+      }
+    });
+  </script>
 </body>
 
 </html>

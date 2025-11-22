@@ -1,226 +1,218 @@
 :root {
-  --primary-blue: #4682b4;
-  --background-light: #f8f9fa;
-  --white: #ffffff;
-  --text-color: #212529;
-  --border-color: #dee2e6;
+  --primary-color: #4682B4;
+  --primary-hover: #3a6ea5;
+  --bg-light: #f4f6f9;
+  --card-bg: #ffffff;
+  --text-dark: #2c3e50;
+  --success-color: #2ecc71;
+  --danger-color: #e74c3c;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --border-radius: 0.75rem;
+  --radius: 12px;
 }
 
 html,
 body {
+  min-height: 100vh;
   height: 100%;
   margin: 0;
-  font-family: "Roboto", sans-serif;
-}
-
-body {
-  background-color: var(--primary-blue);
+  background-color: var(--bg-light);
+  font-family: 'Inter', sans-serif;
   display: flex;
   flex-direction: column;
-}
-
-.pdv-header,
-.pdv-footer {
-  flex-shrink: 0;
-  background-color: var(--white);
-  color: var(--primary-blue);
-  padding: 0.75rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .pdv-main {
   flex-grow: 1;
-  padding: 8.5rem 2.5rem;
-  overflow: hidden;
+}
+
+/* --- HEADER --- */
+.pdv-header {
+  background-color: var(--card-bg);
+  padding: 0.5rem 1.5rem;
+  /* Reduzi um pouco o padding vertical para compensar a logo maior */
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  height: 90px;
+  /* Define uma altura fixa para o header acomodar a logo */
 }
 
-.pdv-main .row {
-  width: 100%;
-  align-items: stretch;
-}
-
-.pdv-footer {
-  justify-content: center;
-  font-weight: 500;
-}
-
+/* 🌟 AQUI ESTÁ A MUDANÇA DA LOGO 🌟 */
 .pdv-header .logo {
-  height: 40px;
+  height: 125px;
+  /* Aumentado de 45px para 80px */
+  width: auto;
+  /* Garante a proporção correta */
+  object-fit: contain;
 }
 
-.pdv-header .badge {
-  font-size: 1rem;
-  padding: 0.6em 1em;
+.caixa-badge {
+  font-weight: 600;
+  padding: 0.5em 1em;
+  border-radius: 20px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
 }
 
-.pdv-header .menu-icon {
-  height: 25px;
-}
-
-.product-panel,
-.cart-panel {
-  background-color: var(--white);
-  border-radius: var(--border-radius);
+/* --- MAIN LAYOUT --- */
+.pdv-main {
+  flex: 1;
   padding: 1.5rem;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
+  /* Evita scroll duplo */
+}
+
+.h-100-custom {
   height: 100%;
 }
 
+/* --- ESQUERDA: PRODUTOS --- */
+.product-panel {
+  background: transparent;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .panel-title {
-  text-align: center;
-  color: var(--primary-blue);
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 1rem;
-  padding: 50px;
-  overflow: hidden;
+  overflow-y: auto;
+  padding-right: 5px;
+  padding-bottom: 20px;
 }
 
 .btn-produto {
-  background-color: var(--background-light);
-  color: var(--primary-blue);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-weight: 500;
-  min-height: 90px;
+  background: var(--card-bg);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-dark);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  transition: all 0.2s ease-in-out;
-  padding: 0.5rem;
+  height: 120px;
 }
 
 .btn-produto:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  background-color: var(--primary-blue);
-  color: var(--white);
+  transform: translateY(-5px);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* --- DIREITA: CARRINHO --- */
+.cart-panel {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eef2f7;
+}
+
+.cart-header {
+  padding: 1rem;
+  border-bottom: 2px solid var(--bg-light);
+  font-weight: 700;
+  color: var(--primary-color);
 }
 
 .cart-list {
-  flex-grow: 1;
+  flex: 1;
   overflow-y: auto;
-  margin-bottom: 1rem;
-  background-color: var(--background-light);
-  border-radius: 8px;
-  min-height: 0;
+  padding: 0;
+}
+
+.list-group-item {
+  border: none;
+  border-bottom: 1px solid #f1f1f1;
+  padding: 1rem;
+  font-size: 0.95rem;
 }
 
 .cart-total-container {
-  text-align: center;
-  margin-top: auto;
+  background: #fcfcfc;
+  padding: 1.5rem;
+  border-top: 2px dashed #dee2e6;
+  border-radius: 0 0 var(--radius) var(--radius);
 }
 
 .cart-total-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--primary-blue);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-color);
 }
 
-.modal-content {
-  border-radius: var(--border-radius);
-  border: none;
+/* --- MODAL PAGAMENTO CUSTOMIZADO --- */
+.payment-group-box {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 10px;
 }
 
-.modal-header {
-  border-bottom: 1px solid var(--border-color);
+.payment-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 5px;
+  display: block;
 }
 
-.modal .modal-title {
-  color: var(--primary-blue);
-  font-weight: 700;
-}
-
-.product-card {
-  background-color: var(--background-light);
-  border-radius: var(--border-radius);
-  padding: 1rem;
-  border: 1px solid var(--border-color);
-  transition: all 0.2s ease-in-out;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow);
-}
-
-.product-card h6 {
-  font-weight: 500;
-  color: var(--text-color);
-  flex-grow: 1;
-}
-
-.product-card .price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary-blue);
-  margin: 0.5rem 0;
-}
-
-.quantity-selector {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.quantity-selector input {
-  border: 1px solid var(--border-color);
+.btn-shortcut {
+  font-size: 0.8rem;
+  font-weight: 600;
   border-radius: 6px;
-  font-weight: 700;
-  width: 50px !important;
+  transition: all 0.2s;
 }
 
-#modalPagamentoPDV .modal-body {
-  padding: 2rem;
+.btn-shortcut:hover {
+  transform: scale(1.05);
 }
 
-#modalPagamentoPDV .input-group-text {
-  background-color: var(--background-light);
-  border-color: var(--border-color);
-  font-weight: 500;
-  min-width: 110px;
+.pdv-footer {
+  background: var(--text-dark);
+  color: white;
+  text-align: center;
+  padding: 5px;
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
-#modalPagamentoPDV .form-control:read-only {
-  background-color: var(--white);
+/* Barra de rolagem bonita */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-#modalPagamentoPDV #totalPDV {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--primary-blue);
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.btn-valor-rapido {
-  flex-grow: 1;
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
 }
 
-.btn-metodo-pagamento {
-  padding: 0.8rem;
-  font-size: 1.1rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }

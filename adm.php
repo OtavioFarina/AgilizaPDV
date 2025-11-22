@@ -7,6 +7,8 @@ $mesAtual = date('m');
 $anoAtual = date('Y');
 $hoje = date('Y-m-d');
 
+// --- CONSULTAS KPI (CARDS) ---
+
 // A. Faturamento do Dia
 $sqlDia = "SELECT SUM(valor_total) as total_dia FROM vendas WHERE DATE(data_hora) = :hoje AND status = 'finalizada'";
 $stmt = $conn->prepare($sqlDia);
@@ -22,8 +24,7 @@ $stmt->bindValue(':ano', $anoAtual);
 $stmt->execute();
 $faturamentoMes = $stmt->fetchColumn() ?: 0.00;
 
-// C. Produtos com Estoque Baixo (Seguindo sua lógica de alerta <= 5)
-// Precisamos somar entradas e subtrair saídas agrupando por produto
+// C. Produtos com Estoque Baixo (Seguindo lógica de alerta <= 5)
 $sqlEstoque = "
     SELECT COUNT(*) as qtd_baixo_estoque FROM (
         SELECT 
@@ -39,7 +40,9 @@ $sqlEstoque = "
 $stmt = $conn->query($sqlEstoque);
 $qtdBaixoEstoque = $stmt->fetchColumn() ?: 0;
 
-// D. Dados para o Gráfico (Vendas por dia no mês atual)
+// --- CONSULTAS PARA GRÁFICOS ---
+
+// D. Gráfico 1: Evolução de Vendas (Linha - Dias do Mês)
 $sqlGrafico = "
     SELECT DATE(data_hora) as dia, SUM(valor_total) as total 
     FROM vendas 
@@ -53,14 +56,56 @@ $stmt->bindValue(':ano', $anoAtual);
 $stmt->execute();
 $dadosGrafico = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Preparar Arrays para o JavaScript
 $labelsGrafico = [];
 $valoresGrafico = [];
-
-// Preenche os dias do mês no gráfico
 foreach ($dadosGrafico as $dado) {
   $labelsGrafico[] = date('d/m', strtotime($dado['dia']));
   $valoresGrafico[] = $dado['total'];
+}
+
+// E. Gráfico 2: Vendas por Categoria (Rosca)
+// Nota: Precisamos unir saida_produtos -> produto -> categoria -> vendas (para filtrar mês/status)
+$sqlCategoria = "
+    SELECT c.nome_categoria, SUM(sp.quantidade) as qtd_vendida
+    FROM saida_produtos sp
+    JOIN produto p ON sp.id_produto = p.id_produto
+    JOIN categoria c ON p.id_categoria = c.id_categoria
+    JOIN vendas v ON sp.venda_id = v.id_venda
+    WHERE MONTH(v.data_hora) = :mes AND YEAR(v.data_hora) = :ano AND v.status = 'finalizada'
+    GROUP BY c.nome_categoria
+";
+$stmtCat = $conn->prepare($sqlCategoria);
+$stmtCat->bindValue(':mes', $mesAtual);
+$stmtCat->bindValue(':ano', $anoAtual);
+$stmtCat->execute();
+$dadosCat = $stmtCat->fetchAll(PDO::FETCH_ASSOC);
+
+$labelsCat = [];
+$valoresCat = [];
+foreach ($dadosCat as $d) {
+  $labelsCat[] = $d['nome_categoria'];
+  $valoresCat[] = $d['qtd_vendida'];
+}
+
+// F. Gráfico 3: Vendas por Forma de Pagamento (Barra ou Pizza)
+$sqlPagamento = "
+    SELECT f.nome_pagamento, SUM(v.valor_total) as total
+    FROM vendas v
+    JOIN forma_pagamento f ON v.id_forma_pagamento = f.id_forma_pagamento
+    WHERE MONTH(v.data_hora) = :mes AND YEAR(v.data_hora) = :ano AND v.status = 'finalizada'
+    GROUP BY f.nome_pagamento
+";
+$stmtPag = $conn->prepare($sqlPagamento);
+$stmtPag->bindValue(':mes', $mesAtual);
+$stmtPag->bindValue(':ano', $anoAtual);
+$stmtPag->execute();
+$dadosPag = $stmtPag->fetchAll(PDO::FETCH_ASSOC);
+
+$labelsPag = [];
+$valoresPag = [];
+foreach ($dadosPag as $d) {
+  $labelsPag[] = $d['nome_pagamento'];
+  $valoresPag[] = $d['total'];
 }
 ?>
 
@@ -84,16 +129,23 @@ foreach ($dadosGrafico as $dado) {
 <body>
 
   <div class="top-bar d-flex align-items-center justify-content-between px-4 py-2">
-    <img src="img/logo pdv.png" class="logo" alt="Logo PDV" style="height:50px;">
+    <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
     <div class="dropdown">
       <button class="btn" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         <img src="img/3riscos.png" alt="Menu" style="height:25px;">
       </button>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
-        <li><a class="dropdown-item" href="vendas.php">Ir para o PDV</a></li>
-        <li><a class="dropdown-item" href="estoque.php">Gestão de Estoque</a></li>
-        <li><a class="dropdown-item" href="consulta_caixa.php">Relatório de Caixa</a></li>
-        <li><a class="dropdown-item" href="logout.php">Sair da Conta</a></li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="vendas.php"><i class='bx bx-cart'></i> Vendas
+            (PDV)</a></li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="estoque.php"><i class='bx bx-box'></i> Estoque</a>
+        </li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="historico_entradas.php"><i
+              class='bx bx-package'></i> Histórico de Entradas</a></li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="historico_vendas.php"><i class='bx bx-history'></i>
+            Histórico de Vendas</a></li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="consulta_caixa.php"><i class="bx bx-basket"></i>
+            Relatório de Caixa</a></li>
+        <li><a class="dropdown-item py-2 text-danger" href="logout.php"><i class='bx bx-log-out'></i> Sair</a></li>
       </ul>
     </div>
   </div>
@@ -102,6 +154,7 @@ foreach ($dadosGrafico as $dado) {
 
     <h2 class="mb-4 fw-bold text-secondary">Dashboard Administrativo</h2>
 
+    <!-- LINHA DE CARDS (KPIs) -->
     <div class="row g-4 mb-5">
       <div class="col-md-4">
         <div class="kpi-card position-relative">
@@ -128,11 +181,36 @@ foreach ($dadosGrafico as $dado) {
       </div>
     </div>
 
-    <div class="row mb-5">
+    <!-- GRÁFICO PRINCIPAL (EVOLUÇÃO) -->
+    <div class="row mb-4">
       <div class="col-12">
-        <div class="chart-container">
-          <h5 class="mb-4">Evolução de Vendas (Mês Atual)</h5>
+        <div class="chart-container shadow-sm p-4 bg-white rounded">
+          <h5 class="mb-4 fw-bold text-secondary">Evolução de Vendas (Mês Atual)</h5>
           <canvas id="salesChart" style="max-height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- LINHA DOS NOVOS GRÁFICOS (LADO A LADO) -->
+    <div class="row g-4 mb-5">
+
+      <!-- Gráfico de Categorias -->
+      <div class="col-md-6">
+        <div class="chart-container shadow-sm p-4 bg-white rounded h-100">
+          <h5 class="mb-4 fw-bold text-secondary">Mais Vendidos por Categoria (Qtd)</h5>
+          <div style="height: 250px; display: flex; justify-content: center;">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico de Pagamentos -->
+      <div class="col-md-6">
+        <div class="chart-container shadow-sm p-4 bg-white rounded h-100">
+          <h5 class="mb-4 fw-bold text-secondary">Faturamento por Pagamento</h5>
+          <div style="height: 250px;">
+            <canvas id="paymentChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -168,7 +246,7 @@ foreach ($dadosGrafico as $dado) {
       <div class="col-6 col-md-3 col-lg-2">
         <a href="cad_estabelecimento.php" class="btn-quick text-decoration-none">
           <i class='bx bx-store-alt'></i>
-          Lojas
+          Estabelecimentos
         </a>
       </div>
 
@@ -185,9 +263,8 @@ foreach ($dadosGrafico as $dado) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+    // --- GRÁFICO 1: EVOLUÇÃO (Linha) ---
     const ctx = document.getElementById('salesChart').getContext('2d');
-
-    // Pegando os dados que vieram do PHP
     const labels = <?= json_encode($labelsGrafico) ?>;
     const dataValues = <?= json_encode($valoresGrafico) ?>;
 
@@ -196,38 +273,82 @@ foreach ($dadosGrafico as $dado) {
       data: {
         labels: labels,
         datasets: [{
-          label: 'Vendas no Dia (R$)',
+          label: 'Vendas (R$)',
           data: dataValues,
-          borderColor: '#4682B4', // Sua cor Azul
+          borderColor: '#4682B4',
           backgroundColor: 'rgba(70, 130, 180, 0.1)',
           borderWidth: 3,
           pointBackgroundColor: '#fff',
           pointBorderColor: '#4682B4',
           pointRadius: 5,
           fill: true,
-          tension: 0.4 // Deixa a linha curvinha e suave
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+
+    // --- GRÁFICO 2: CATEGORIAS (Rosca/Doughnut) ---
+    const ctxCat = document.getElementById('categoryChart').getContext('2d');
+    const labelsCat = <?= json_encode($labelsCat) ?>;
+    const valuesCat = <?= json_encode($valoresCat) ?>;
+
+    new Chart(ctxCat, {
+      type: 'doughnut',
+      data: {
+        labels: labelsCat,
+        datasets: [{
+          data: valuesCat,
+          backgroundColor: [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+          ],
+          hoverOffset: 4
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: false // Esconde a legenda pra ficar mais limpo
-          }
-        },
+          legend: { position: 'right' }
+        }
+      }
+    });
+
+    // --- GRÁFICO 3: PAGAMENTOS (Barras) ---
+    const ctxPag = document.getElementById('paymentChart').getContext('2d');
+    const labelsPag = <?= json_encode($labelsPag) ?>;
+    const valuesPag = <?= json_encode($valoresPag) ?>;
+
+    new Chart(ctxPag, {
+      type: 'bar',
+      data: {
+        labels: labelsPag,
+        datasets: [{
+          label: 'Total Recebido (R$)',
+          data: valuesPag,
+          backgroundColor: [
+            '#20c997', // Verde (Dinheiro/Pix)
+            '#0d6efd', // Azul (Débito)
+            '#6f42c1', // Roxo (Crédito)
+            '#ffc107'  // Amarelo
+          ],
+          borderRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              borderDash: [5, 5]
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
+          y: { beginAtZero: true }
         }
       }
     });
