@@ -1,107 +1,174 @@
+<?php
+session_start();
+
+// 1. Segurança
+if (!isset($_SESSION['nome_usuario'])) {
+  header("Location: acesso.php");
+  exit();
+}
+
+$tipo_usuario = isset($_SESSION['tipo_usuario']) ? $_SESSION['tipo_usuario'] : 0;
+if ($tipo_usuario != 1) {
+  echo "<script>alert('Acesso Negado: Apenas administradores.'); window.location.href='vendas.php';</script>";
+  exit();
+}
+
+require_once "conexao.php";
+$mensagem_swal = "";
+
+try {
+  // CADASTRAR
+  if (isset($_POST["cadastrar"])) {
+    $nome = $_POST["nome"];
+
+    $sql = $conn->prepare("INSERT INTO categoria (id_categoria, nome_categoria) VALUES(NULL, :nome_categoria)");
+    $sql->bindValue(':nome_categoria', $nome);
+
+    if ($sql->execute()) {
+      $mensagem_swal = "Swal.fire({ icon: 'success', title: 'Sucesso!', text: 'Categoria cadastrada.', showConfirmButton: false, timer: 1500 });";
+    }
+  }
+
+  // EXCLUIR
+  if (isset($_GET["ex"])) {
+    $id_categoria = $_GET["ex"];
+
+    // Verifica se tem produtos vinculados antes de excluir (Opcional, mas recomendado)
+    // O banco geralmente barra por Foreign Key, vamos tratar o erro no catch
+    $sql = $conn->prepare("DELETE FROM categoria WHERE id_categoria = :id_categoria");
+    $sql->bindValue(":id_categoria", $id_categoria);
+
+    if ($sql->execute()) {
+      header("Location: cad_categoria.php?msg=excluido");
+      exit();
+    }
+  }
+
+  if (isset($_GET['msg']) && $_GET['msg'] == 'excluido') {
+    $mensagem_swal = "Swal.fire({ icon: 'success', title: 'Excluído!', text: 'Categoria removida.', timer: 2000, showConfirmButton: false });";
+  }
+
+} catch (PDOException $erro) {
+  // Tratamento específico para erro de chave estrangeira (tentar excluir categoria em uso)
+  if ($erro->getCode() == '23000') {
+    $msg_erro = "Não é possível excluir esta categoria pois existem produtos vinculados a ela.";
+  } else {
+    $msg_erro = $erro->getMessage();
+  }
+  $mensagem_swal = "Swal.fire({ icon: 'error', title: 'Erro!', text: '$msg_erro' });";
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDV - Cadastro de Categorias</title>
-
+  <title>PDV - Categorias</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
   <link href="styles/style_cad.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
-  <div class="top-bar d-flex align-items-center justify-content-between px-3 py-2 bg-light rounded shadow-sm">
-    <img src="img/logo pdv.png" class="logo" alt="Logo PDV" style="height:50px;">
+
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-3">
+      <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
+      <h5 class="m-0 fw-bold text-secondary d-none d-md-block">Administrativo</h5>
+    </div>
     <div class="dropdown">
-      <button class="btn dropdown" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="img/3riscos.png" class="3riscos" alt="Simbolo3Riscos" style="height:25px;">
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
+      <button class="btn btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown"><i
+          class='bx bx-menu fs-3'></i></button>
+      <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+        <li><a class="dropdown-item py-2" href="adm.php"><i class='bx bxs-dashboard'></i> Voltar ao Painel</a></li>
         <li>
-          <a class="dropdown-item" href="adm.php">Painel Administrativo</a>
+          <hr class="dropdown-divider">
         </li>
+        <li><a class="dropdown-item py-2 text-danger" href="logout.php"><i class='bx bx-log-out'></i> Sair</a></li>
       </ul>
     </div>
   </div>
 
-  <?php
-  require_once "conexao.php";
-  $mensagem = "";
-
-  try {
-    if (isset($_POST["cadastrar"])) {
-      $nome = $_POST["nome"];
-
-      $sql = $conn->prepare("INSERT INTO categoria (id_categoria, nome_categoria) 
-                             VALUES(:id_categoria, :nome_categoria)");
-      $sql->bindValue(':id_categoria', null);
-      $sql->bindValue(':nome_categoria', $nome);
-      $sql->execute();
-
-      $mensagem = "<div class='alert alert-success text-center mt-3'>Cadastro realizado com sucesso!</div>";
-    }
-
-    if (isset($_GET["ex"])) {
-      $id_categoria = $_GET["ex"];
-      $sql = $conn->prepare("DELETE FROM categoria WHERE id_categoria = :id_categoria");
-      $sql->bindValue(":id_categoria", $id_categoria);
-      $sql->execute();
-      $mensagem = "<div class='alert alert-warning text-center mt-3'>Categoria excluída com sucesso!</div>";
-    }
-  } catch (PDOException $erro) {
-    $mensagem = "<div class='alert alert-danger text-center mt-3'>Erro: " . htmlspecialchars($erro->getMessage()) . "</div>";
-  }
-  ?>
-
   <div class="main-container">
-    <h1 class="text-center mb-4">Cadastro de Categorias</h1>
+    <h2 class="page-title"><i class='bx bx-category'></i> Gerenciar Categorias</h2>
 
-    <?php echo $mensagem; ?>
-
-    <form name="formCategoria" method="post" action="" enctype="multipart/form-data">
-      <div class="mb-3">
-        <label for="nome" class="form-label">Nome da Categoria</label>
-        <input type="text" class="form-control" id="nome" name="nome" required>
-      </div>
-
-      <button type="submit" name="cadastrar" class="btn btn-primary w-100">Cadastrar Categoria</button>
-    </form>
+    <div class="form-card">
+      <h5 class="mb-4 text-primary fw-bold">Nova Categoria</h5>
+      <form method="post" action="">
+        <div class="row align-items-end">
+          <div class="col-md-10 mb-3">
+            <label for="nome" class="form-label">Nome da Categoria</label>
+            <input type="text" class="form-control" id="nome" name="nome" placeholder="Ex: Picolés Gourmet" required>
+          </div>
+          <div class="col-md-2 mb-3">
+            <button type="submit" name="cadastrar" class="btn btn-primary w-100"><i class='bx bx-plus'></i>
+              Salvar</button>
+          </div>
+        </div>
+      </form>
+    </div>
 
     <?php
     try {
-      $usuarios = $conn->query("SELECT * FROM categoria");
+      $lista = $conn->query("SELECT * FROM categoria ORDER BY nome_categoria ASC");
     } catch (PDOException $e) {
-      echo "<div class='alert alert-danger mt-3'>Erro ao buscar a categoria: " . htmlspecialchars($e->getMessage()) . "</div>";
+      $lista = null;
     }
     ?>
 
-    <div class="table-container mt-4">
-      <h2 class="text-center mb-4">Categorias Cadastradas</h2>
-
-      <table class="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>ID da Categoria</th>
-            <th>Nome</th>
-            <th>Alterar</th>
-            <th>Excluir</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php while ($categoria = $usuarios->fetch(PDO::FETCH_ASSOC)) : ?>
+    <div class="table-container">
+      <h5 class="mb-4 text-secondary fw-bold">Categorias Cadastradas</h5>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
             <tr>
-              <td><?php echo htmlspecialchars($categoria['id_categoria']); ?></td>
-              <td><?php echo htmlspecialchars($categoria['nome_categoria']); ?></td>
-              <td><a href="alt_categoria.php?al=<?php echo $categoria["id_categoria"]; ?>"><img src="img/caneta.png" alt="Editar" width="40"></a></td>
-              <td><a href="cad_categoria.php?ex=<?php echo $categoria["id_categoria"]; ?>" onclick="return confirm('Tem certeza que deseja excluir esta categoria?')"><img src="img/apagar.png" alt="Excluir" width="40"></a></td>
+              <th>ID</th>
+              <th>Nome</th>
+              <th class="text-center" style="width: 150px;">Ações</th>
             </tr>
-          <?php endwhile; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php if ($lista): ?>
+              <?php while ($row = $lista->fetch(PDO::FETCH_ASSOC)): ?>
+                <tr>
+                  <td class="fw-bold text-muted">#<?= htmlspecialchars($row['id_categoria']); ?></td>
+                  <td class="fw-bold text-dark"><?= htmlspecialchars($row['nome_categoria']); ?></td>
+                  <td class="text-center">
+                    <a href="alt_categoria.php?al=<?= $row["id_categoria"]; ?>"
+                      class="btn btn-sm btn-outline-primary border-0"><i class='bx bx-edit-alt fs-5'></i></a>
+                    <a href="#" onclick="confirmarExclusao(<?= $row['id_categoria']; ?>)"
+                      class="btn btn-sm btn-outline-danger border-0"><i class='bx bx-trash fs-5'></i></a>
+                  </td>
+                </tr>
+              <?php endwhile; ?>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    <?php if (!empty($mensagem_swal))
+      echo $mensagem_swal; ?>
+    function confirmarExclusao(id) {
+      Swal.fire({
+        title: 'Tem certeza?',
+        text: "Você não poderá reverter isso!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => { if (result.isConfirmed) { window.location.href = `?ex=${id}`; } })
+    }
+  </script>
 </body>
 
 </html>

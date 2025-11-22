@@ -1,4 +1,38 @@
 <?php
+session_start();
+
+// 1. Verificação de Login
+if (!isset($_SESSION['nome_usuario'])) {
+  header("Location: index.php");
+  exit();
+}
+
+// 2. Verificação de Permissão (Apenas ADM)
+$tipo_usuario = isset($_SESSION['tipo_usuario']) ? $_SESSION['tipo_usuario'] : 0;
+
+if ($tipo_usuario != 1) {
+  // Se não for ADM, redireciona para vendas ou mostra erro
+  // Aqui vamos mostrar um erro amigável e um botão de voltar
+  die('
+        <!DOCTYPE html>
+        <html lang="pt-br">
+        <head>
+            <meta charset="UTF-8">
+            <title>Acesso Negado</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+            <div class="text-center">
+                <h1 class="display-1 fw-bold text-danger">403</h1>
+                <p class="fs-3"> <span class="text-danger">Opps!</span> Acesso Negado.</p>
+                <p class="lead">Você não tem permissão para acessar esta página.</p>
+                <a href="vendas.php" class="btn btn-primary">Voltar para Vendas</a>
+            </div>
+        </body>
+        </html>
+    ');
+}
+
 $host = 'localhost';
 $dbname = 'banco';
 $user = 'root';
@@ -11,7 +45,7 @@ try {
   die("Erro na conexão: " . $e->getMessage());
 }
 
-// Lógica de filtro (com ajuste para datas)
+// Lógica de filtro
 $where = [];
 $params = [];
 
@@ -22,10 +56,6 @@ if (!empty($_GET['produto'])) {
 if (!empty($_GET['sabor'])) {
   $where[] = "sabor LIKE ?";
   $params[] = "%" . $_GET['sabor'] . "%";
-}
-if (!empty($_GET['tipo'])) {
-  $where[] = "tipo = ?";
-  $params[] = $_GET['tipo'];
 }
 if (!empty($_GET['data_inicial'])) {
   $where[] = "DATE(data) >= ?";
@@ -56,154 +86,124 @@ $entradas = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Histórico de Entradas</title>
 
+  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Boxicons -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
-  <style>
-    :root {
-      --primary-blue: #4682B4;
-      --background-light: #f8f9fa;
-      --white: #ffffff;
-      --text-color: #212529;
-      --border-color: #dee2e6;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --border-radius: 0.75rem;
-      /* 12px */
-    }
-
-    body {
-      background-color: var(--primary-blue);
-      font-family: 'Roboto', sans-serif;
-      color: var(--text-color);
-    }
-
-    .top-bar {
-      background-color: var(--white);
-      box-shadow: var(--shadow);
-    }
-
-    .top-bar .logo {
-      height: 50px;
-    }
-
-    .main-container {
-      background-color: var(--white);
-      border-radius: var(--border-radius);
-      padding: 2rem;
-      margin: 2rem auto;
-      max-width: 1200px;
-      box-shadow: var(--shadow);
-    }
-
-    .page-title {
-      color: var(--primary-blue);
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .form-card {
-      background-color: var(--background-light);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-    }
-
-    .table {
-      border-color: var(--border-color);
-    }
-
-    .table thead {
-      background-color: var(--background-light);
-    }
-
-    .table>thead>tr>th {
-      color: var(--primary-blue);
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .table-hover tbody tr:hover {
-      background-color: #eef5ff;
-    }
-  </style>
+  <link rel="stylesheet" href="styles/style_estoque.css" />
 </head>
 
 <body>
-  <div class="top-bar d-flex align-items-center justify-content-between px-3 py-2">
-    <img src="img/logo pdv.png" class="logo" alt="Logo PDV" style="height:50px;">
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-3">
+      <img src="img/logoagilizasemfundo.png" alt="Logo PDV" style="height: 60px; width: auto;">
+      <h5 class="m-0 fw-bold text-secondary d-none d-md-block">Histórico de Movimentações</h5>
+    </div>
+
     <div class="dropdown">
-      <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="img/3riscos.png" alt="Menu" style="height:25px;">
+      <button class="btn btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown">
+        <i class='bx bx-menu fs-3'></i>
       </button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="vendas.php">Vendas (PDV)</a></li>
-        <li><a class="dropdown-item" href="estoque.php">Gestão de Estoque</a></li>
-        <li><a class="dropdown-item" href="adm.php">Painel Administrativo</a></li>
+      <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+        <li><a class="dropdown-item py-2" href="vendas.php"><i class='bx bx-cart'></i> Vendas (PDV)</a></li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="estoque.php"><i class='bx bx-box'></i> Gestão de
+            Estoque</a></li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="adm.php"><i class='bx bxs-dashboard'></i> Painel
+            Adm</a></li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li><a class="dropdown-item py-2 text-danger" href="logout.php"><i class='bx bx-log-out'></i> Sair</a></li>
       </ul>
     </div>
   </div>
 
   <div class="container main-container">
-    <h2 class="page-title">Histórico de Entradas no Estoque</h2>
+    <h4 class="page-title">Histórico de Entradas no Estoque</h4>
 
-    <div class="form-card mb-4">
+    <!-- CARD DE FILTROS -->
+    <div class="card-filter">
+      <h6 class="text-muted mb-3 fw-bold text-uppercase small"><i class='bx bx-filter-alt'></i> Filtros de Busca</h6>
       <form method="GET" class="row g-3 align-items-end">
         <div class="col-md-3">
-          <label class="form-label">Produto</label>
-          <input type="text" name="produto" class="form-control" placeholder="Nome do produto"
-            value="<?= htmlspecialchars($_GET['produto'] ?? '') ?>" />
+          <label class="form-label fw-semibold">Produto / Sabor</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class='bx bx-search'></i></span>
+            <input type="text" name="produto" class="form-control" placeholder="Ex: Chocolate"
+              value="<?= htmlspecialchars($_GET['produto'] ?? '') ?>" />
+          </div>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Data Inicial</label>
+          <label class="form-label fw-semibold">Data Inicial</label>
           <input type="date" name="data_inicial" class="form-control"
             value="<?= htmlspecialchars($_GET['data_inicial'] ?? '') ?>" />
         </div>
         <div class="col-md-3">
-          <label class="form-label">Data Final</label>
+          <label class="form-label fw-semibold">Data Final</label>
           <input type="date" name="data_final" class="form-control"
             value="<?= htmlspecialchars($_GET['data_final'] ?? '') ?>" />
         </div>
         <div class="col-md-3 d-flex gap-2">
-          <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-          <a href="<?= $_SERVER['PHP_SELF'] ?>" class="btn btn-outline-secondary w-100">Limpar</a>
+          <button type="submit" class="btn btn-primary w-100 fw-bold"><i class='bx bx-check'></i> Filtrar</button>
+          <a href="<?= $_SERVER['PHP_SELF'] ?>" class="btn btn-outline-secondary w-100" title="Limpar Filtros"><i
+              class='bx bx-x'></i></a>
         </div>
       </form>
     </div>
 
-    <div class="table-responsive">
-      <table class="table table-striped table-hover table-bordered text-center align-middle">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Produto</th>
-            <th>Sabor</th>
-            <th>Categoria</th>
-            <th>Quantidade</th>
-            <th>Custo (R$)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php if (count($entradas) > 0): ?>
-            <?php foreach ($entradas as $row): ?>
-              <tr>
-                <td><?= date('d/m/Y H:i', strtotime($row['data'])) ?></td>
-                <td><?= htmlspecialchars($row['produto']) ?></td>
-                <td><?= htmlspecialchars($row['sabor']) ?></td>
-                <td><?= htmlspecialchars($row['tipo']) ?></td>
-                <td class="fw-bold"><?= $row['estoque_atual'] ?></td>
-                <td><?= number_format($row['valor_custo'], 2, ',', '.') ?></td>
-              </tr>
-            <?php endforeach; ?>
-          <?php else: ?>
+    <!-- TABELA DE RESULTADOS -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
             <tr>
-              <td colspan="6" class="p-4">Nenhum registro de entrada encontrado para os filtros aplicados.</td>
+              <th>Data / Hora</th>
+              <th>Produto</th>
+              <th>Sabor</th>
+              <th>Categoria</th>
+              <th class="text-center">Qtd. Entrada</th>
+              <th class="text-end">Custo Unit.</th>
+              <th class="text-end">Custo Total</th>
             </tr>
-          <?php endif; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php if (count($entradas) > 0): ?>
+              <?php foreach ($entradas as $row): ?>
+                <tr>
+                  <td class="text-muted small">
+                    <i class='bx bx-calendar'></i> <?= date('d/m/Y', strtotime($row['data'])) ?> <br>
+                    <i class='bx bx-time'></i> <?= date('H:i', strtotime($row['data'])) ?>
+                  </td>
+                  <td class="fw-bold text-dark"><?= htmlspecialchars($row['produto']) ?></td>
+                  <td><?= htmlspecialchars($row['sabor']) ?></td>
+                  <td><span class="badge bg-light text-secondary border"><?= htmlspecialchars($row['tipo']) ?></span></td>
+                  <td class="text-center">
+                    <span
+                      class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2">
+                      +<?= $row['estoque_atual'] ?>
+                    </span>
+                  </td>
+                  <td class="text-end text-muted">R$ <?= number_format($row['valor_custo'], 2, ',', '.') ?></td>
+                  <td class="text-end fw-bold text-primary">
+                    R$ <?= number_format($row['valor_custo'] * $row['estoque_atual'], 2, ',', '.') ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="7" class="text-center p-5 text-muted">
+                  <i class='bx bx-search-alt fs-1 mb-3 opacity-25'></i>
+                  <p class="mb-0">Nenhum registro encontrado para os filtros aplicados.</p>
+                </td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
