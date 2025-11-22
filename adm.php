@@ -116,7 +116,7 @@ foreach ($dadosPag as $d) {
   $valoresPag[] = $d['total'];
 }
 ?>
-<!DOCTYPE html>>
+<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
