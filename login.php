@@ -22,14 +22,27 @@ if (isset($_POST['bt_login'])) {
                 // 1. Verifica a Senha
                 if (password_verify($senha, $row['senha'])) {
 
-                    // 2. Verifica se o usuário pertence à loja selecionada
-                    if ($row['id_estabelecimento'] == $id_loja_selecionada) {
+                    // 2. Verifica permissões de acesso ao estabelecimento
+                    // Admin (tipo_usuario = 1) pode acessar qualquer estabelecimento
+                    // Vendedor (tipo_usuario = 0) só pode acessar seu estabelecimento vinculado
+                    $pode_acessar = false;
+                    
+                    if ($row['tipo_usuario'] == 1) {
+                        // Admin: pode acessar qualquer estabelecimento
+                        $pode_acessar = true;
+                    } else {
+                        // Vendedor: só pode acessar o estabelecimento ao qual está vinculado
+                        if ($row['id_estabelecimento'] == $id_loja_selecionada) {
+                            $pode_acessar = true;
+                        }
+                    }
 
+                    if ($pode_acessar) {
                         // Login Sucesso!
                         $_SESSION['id_usuario'] = $row['id_usuario'];
                         $_SESSION['tipo_usuario'] = $row['tipo_usuario'];
                         $_SESSION['nome_usuario'] = $row['nome_usuario'];
-                        $_SESSION['id_estabelecimento'] = $row['id_estabelecimento']; // Útil para usar nas vendas depois
+                        $_SESSION['id_estabelecimento'] = $id_loja_selecionada; // Usa o estabelecimento SELECIONADO
 
                         if ($row['tipo_usuario'] == 1) {
                             header("Location: adm.php");
@@ -39,9 +52,9 @@ if (isset($_POST['bt_login'])) {
                         exit();
 
                     } else {
-                        // Usuário existe, senha ok, mas loja errada
+                        // Usuário existe, senha ok, mas não tem permissão para esta loja
                         echo "<script>
-                                alert('Acesso negado! Este usuário não está vinculado à loja selecionada.');
+                                alert('Acesso negado! Você não tem permissão para acessar este estabelecimento.');
                                 window.location.href = 'index.php';
                               </script>";
                     }
