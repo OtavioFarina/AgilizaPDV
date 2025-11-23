@@ -1,7 +1,7 @@
-LOGIN:
+usuario: Vendedor // usuario comum
 
-VendedorSR
-1234
+senha: vendedor
 
-VendedorCS // ADM
-12345
+usuario: Admin // administrador
+
+senha: admin
