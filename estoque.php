@@ -133,18 +133,10 @@ if ($tipo_usuario == 1) {
                 <i class='bx bx-menu fs-3'></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                <li><a class="dropdown-item py-2" href="vendas.php"><i class='bx bx-cart'></i> Vendas (PDV)</a></li>
-                <?php if ($tipo_usuario == 1): ?>
-                    <li><a class="dropdown-item py-2 text-primary fw-bold" href="historico_entradas.php"><i
-                                class='bx bxs-box'></i>
-                            Histórico de Entradas</a></li>
-                <?php endif; ?>
-
                 <?php if ($tipo_usuario == 1): ?>
                     <li><a class="dropdown-item py-2 text-primary fw-bold" href="adm.php"><i class='bx bxs-dashboard'></i>
-                            Painel Adm</a></li>
+                            Voltar ao Dashboard</a></li>
                 <?php endif; ?>
-
                 <li>
                     <hr class="dropdown-divider">
                 </li>

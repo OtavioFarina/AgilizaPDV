@@ -3,8 +3,8 @@ session_start();
 
 // Proteção: Só ADM pode acessar
 if (!isset($_SESSION['id_usuario']) || $_SESSION['tipo_usuario'] != 1) {
-    header("Location: vendas.php");
-    exit();
+  header("Location: vendas.php");
+  exit();
 }
 
 require_once "conexao.php";
@@ -122,7 +122,7 @@ foreach ($dadosPag as $d) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDV - Dashboard Gerencial</title>
+  <title>PDV - Dashboard Administrativo</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -134,23 +134,23 @@ foreach ($dadosPag as $d) {
 </head>
 
 <body>
-
   <div class="top-bar d-flex align-items-center justify-content-between px-4 py-2">
-    <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
+    <div class="d-flex align-items-center gap-3">
+      <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
+      <h4 class="m-0 fw-bold text-secondary d-none d-md-block">Dashboard Administrativo</h4>
+    </div>
     <div class="dropdown">
       <button class="btn" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         <img src="img/3riscos.png" alt="Menu" style="height:25px;">
       </button>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
-        <li><a class="dropdown-item py-2 text-primary fw-bold" href="vendas.php"><i class='bx bx-cart'></i> Vendas
+        <li><a class="dropdown-item py-2" href="vendas.php"><i class='bx bx-cart'></i> Vendas
             (PDV)</a></li>
-        <li><a class="dropdown-item py-2 text-primary fw-bold" href="estoque.php"><i class='bx bx-box'></i> Estoque</a>
-        </li>
-        <li><a class="dropdown-item py-2 text-primary fw-bold" href="historico_entradas.php"><i
-              class='bx bx-package'></i> Histórico de Entradas</a></li>
-        <li><a class="dropdown-item py-2 text-primary fw-bold" href="historico_vendas.php"><i class='bx bx-history'></i>
+        <li><a class="dropdown-item py-2" href="historico_entradas.php"><i class='bx bx-package'></i> Histórico de
+            Entradas</a></li>
+        <li><a class="dropdown-item py-2" href="historico_vendas.php"><i class='bx bx-history'></i>
             Histórico de Vendas</a></li>
-        <li><a class="dropdown-item py-2 text-primary fw-bold" href="consulta_caixa.php"><i class="bx bx-basket"></i>
+        <li><a class="dropdown-item py-2" href="consulta_caixa.php"><i class="bx bx-basket"></i>
             Relatório de Caixa</a></li>
         <li><a class="dropdown-item py-2 text-danger" href="logout.php"><i class='bx bx-log-out'></i> Sair</a></li>
       </ul>
@@ -158,8 +158,6 @@ foreach ($dadosPag as $d) {
   </div>
 
   <div class="container py-5">
-
-    <h2 class="mb-4 fw-bold text-secondary">Dashboard Administrativo</h2>
 
     <!-- LINHA DE CARDS (KPIs) -->
     <div class="row g-4 mb-5">

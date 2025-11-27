@@ -51,7 +51,7 @@ foreach ($produtos as $p) {
 <body>
     <header class="pdv-header">
         <div class="d-flex align-items-center gap-3">
-            <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV" style="height: 120px; width: auto;">
+            <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
             <h4 class="m-0 fw-bold text-secondary d-none d-md-block">Ponto de Venda</h4>
         </div>
 
@@ -75,7 +75,7 @@ foreach ($produtos as $p) {
                     <?php if ($tipo_usuario == 1): ?>
                         <li>
                             <a class="dropdown-item py-2 text-primary fw-bold" href="adm.php">
-                                <i class='bx bxs-dashboard'></i> Painel Administrativo
+                                <i class='bx bxs-dashboard'></i> Dashboard Administrativo
                             </a>
                         </li>
                         <li>

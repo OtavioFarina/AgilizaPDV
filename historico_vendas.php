@@ -62,11 +62,8 @@ try {
                 <i class='bx bx-menu fs-3'></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                <li><a class="dropdown-item py-2" href="vendas.php"><i class='bx bx-cart'></i> Vendas (PDV)</a></li>
-                <li><a class="dropdown-item py-2 text-primary fw-bold" href="estoque.php"><i class='bx bx-box'></i>
-                        Gestão de Estoque</a></li>
-                <li><a class="dropdown-item py-2 text-primary fw-bold" href="adm.php"><i class='bx bxs-dashboard'></i>
-                        Painel Adm</a></li>
+                <li><a class="dropdown-item py-2 text-primary fw-bold" href="adm.php"><i
+                            class='bx bxs-dashboard'></i>Voltar ao Dashboard</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
