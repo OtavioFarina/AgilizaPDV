@@ -660,7 +660,7 @@ foreach ($produtos as $p) {
                         })
                         .catch(error => {
                             carrinho = carrinhoBackup;
-                            Swal.fire({ icon: 'error', title: 'Erro', text: 'Falha na comunicação.', heightAuto: false });
+                            Swal.fire({ icon: 'error', title: 'Erro', text: 'Estoque Insuficiente.', heightAuto: false });
                         });
                 }
             });
