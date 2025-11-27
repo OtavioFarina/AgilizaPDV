@@ -74,7 +74,8 @@ try {
       <button class="btn btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown"><i
           class='bx bx-menu fs-3'></i></button>
       <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-        <li><a class="dropdown-item py-2" href="adm.php"><i class='bx bxs-dashboard'></i> Voltar ao Painel</a></li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="adm.php"><i class='bx bxs-dashboard'></i> Voltar ao
+            Dashboard</a></li>
         <li>
           <hr class="dropdown-divider">
         </li>
