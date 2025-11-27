@@ -69,7 +69,11 @@ if (isset($_POST["alterar"])) {
       <button class="btn btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown"><i
           class='bx bx-menu fs-3'></i></button>
       <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-        <li><a class="dropdown-item py-2" href="cad_categoria.php"><i class='bx bx-arrow-back'></i> Voltar</a></li>
+        <li><a class="dropdown-item py-2 text-primary fw-bold" href="cad_categoria.php"><i class='bx bx-arrow-back'></i>
+            Voltar</a></li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
         <li><a class="dropdown-item py-2 text-danger" href="logout.php"><i class='bx bx-log-out'></i> Sair</a></li>
       </ul>
     </div>
