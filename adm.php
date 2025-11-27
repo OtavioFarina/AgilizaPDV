@@ -34,19 +34,18 @@ $faturamentoMes = $stmt->fetchColumn() ?: 0.00;
 
 // C. Produtos com Estoque Baixo (Seguindo lógica de alerta <= 5)
 $sqlEstoque = "
-    SELECT COUNT(*) as qtd_baixo_estoque FROM (
-        SELECT 
-            produto, sabor, tipo,
-            SUM(CASE WHEN movimentacao = 'Entrada' THEN estoque_atual 
-                     WHEN movimentacao = 'Saída' THEN -estoque_atual 
-                END) as saldo_final
-        FROM estoque 
-        GROUP BY produto, sabor, tipo
-        HAVING saldo_final <= 5
-    ) as subquery
+    SELECT produto, sabor, tipo,
+        SUM(CASE WHEN movimentacao = 'Entrada' THEN estoque_atual 
+                 WHEN movimentacao = 'Saída' THEN -estoque_atual 
+            END) as saldo_final
+    FROM estoque 
+    GROUP BY produto, sabor, tipo
+    HAVING saldo_final <= 5
+    ORDER BY saldo_final ASC
 ";
-$stmt = $conn->query($sqlEstoque);
-$qtdBaixoEstoque = $stmt->fetchColumn() ?: 0;
+$stmtEstoque = $conn->query($sqlEstoque);
+$produtosBaixoEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
+$qtdBaixoEstoque = count($produtosBaixoEstoque);
 
 // --- CONSULTAS PARA GRÁFICOS ---
 
@@ -178,7 +177,7 @@ foreach ($dadosPag as $d) {
       </div>
 
       <div class="col-md-4">
-        <div class="kpi-card position-relative" style="border-left-color: #dc3545;">
+        <div class="kpi-card position-relative" style="border-left-color: #dc3545; cursor: pointer;" id="btnEstoqueBaixo" role="button">
           <div class="kpi-title">Estoque Baixo (≤ 5)</div>
           <div class="kpi-value text-danger"><?= $qtdBaixoEstoque ?> <small style="font-size: 1rem;">itens</small></div>
           <i class='bx bx-error-circle kpi-icon' style="color: #dc3545;"></i>
@@ -265,9 +264,67 @@ foreach ($dadosPag as $d) {
 
   </div>
 
+  <!-- Modal para Produtos com Estoque Baixo -->
+  <div class="modal fade" id="estoqueModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger bg-opacity-10 border-bottom">
+          <h5 class="modal-title fw-bold text-danger">
+            <i class='bx bx-error-circle'></i> Produtos com Estoque Crítico (≤ 5)
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div id="estoqueList" style="max-height: 400px; overflow-y: auto;">
+            <!-- Lista será preenchida aqui -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+    // Evento de clique no card de Estoque Baixo
+    document.getElementById('btnEstoqueBaixo').addEventListener('click', function() {
+      const produtosBaixo = <?= json_encode($produtosBaixoEstoque) ?>;
+      const listaEl = document.getElementById('estoqueList');
+      
+      if (produtosBaixo.length === 0) {
+        listaEl.innerHTML = '<p class="text-muted text-center py-5">Nenhum produto com estoque crítico no momento.</p>';
+      } else {
+        let html = '<div class="list-group">';
+        produtosBaixo.forEach(item => {
+          html += `
+            <div class="list-group-item border-start border-4 border-danger">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <h6 class="mb-1 fw-bold text-dark">${item.produto}</h6>
+                  <p class="mb-0 text-muted small">
+                    <strong>Sabor:</strong> ${item.sabor} | <strong>Categoria:</strong> ${item.tipo}
+                  </p>
+                </div>
+                <div class="text-end">
+                  <span class="badge bg-danger text-white">Crítico</span>
+                  <p class="mb-0 fw-bold text-danger mt-2" style="font-size: 1.2rem;">${item.saldo_final} un</p>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        listaEl.innerHTML = html;
+      }
+      
+      // Abrir modal
+      const modal = new bootstrap.Modal(document.getElementById('estoqueModal'));
+      modal.show();
+    });
+
     // --- GRÁFICO 1: EVOLUÇÃO (Linha) ---
     const ctx = document.getElementById('salesChart').getContext('2d');
     const labels = <?= json_encode($labelsGrafico) ?>;
