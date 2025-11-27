@@ -190,7 +190,7 @@ $entradas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     R$ <?= number_format($row['valor_custo'] * $row['estoque_atual'], 2, ',', '.') ?>
                   </td>
                   <td class="text-end">
-                    <a href="alt_estoque.php?id=<?= $row['id_estoque'] ?>" class="btn btn-sm btn-outline-primary"><i class='bx bx-edit'></i> </a>
+                    <a href="alt_estoque.php?id=<?= $row['id_estoque'] ?>" class="btn btn-sm btn-outline-primary"><i class='bx bx-edit'></i> Editar</a>
                   </td>
                 </tr>
               <?php endforeach; ?>
