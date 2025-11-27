@@ -53,8 +53,8 @@ try {
     <!-- TOP BAR (IGUAL AO ESTOQUE) -->
     <div class="top-bar">
         <div class="d-flex align-items-center gap-3">
-            <img src="img/logoagilizasemfundo.png" alt="Logo PDV" style="height: 60px; width: auto;">
-            <h5 class="m-0 fw-bold text-secondary d-none d-md-block">Histórico de Vendas</h5>
+            <img src="img/logoagilizasemfundo.png" alt="Logo PDV" style="height: 125px; width: auto;">
+            <h4 class="m-0 fw-bold text-secondary d-none d-md-block">Histórico de Vendas</h4>
         </div>
 
         <div class="dropdown">
