@@ -51,7 +51,7 @@ foreach ($produtos as $p) {
 <body>
     <header class="pdv-header">
         <div class="d-flex align-items-center gap-3">
-            <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV" style="height: 120px; width: auto;">
+            <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV" style="height: 125px; width: auto;">
             <h4 class="m-0 fw-bold text-secondary d-none d-md-block">Ponto de Venda</h4>
         </div>
 
