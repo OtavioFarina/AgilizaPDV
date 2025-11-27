@@ -66,7 +66,7 @@ if (!empty($_GET['data_final'])) {
   $params[] = $_GET['data_final'];
 }
 
-$sql = "SELECT produto, sabor, tipo, estoque_atual, valor_custo, data FROM estoque WHERE movimentacao = 'Entrada'";
+$sql = "SELECT id_estoque, produto, sabor, tipo, estoque_atual, valor_custo, data FROM estoque WHERE movimentacao = 'Entrada'";
 
 if ($where) {
   $sql .= " AND " . implode(" AND ", $where);
@@ -165,6 +165,7 @@ $entradas = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <th class="text-center">Qtd. Entrada</th>
               <th class="text-end">Custo Unit.</th>
               <th class="text-end">Custo Total</th>
+              <th class="text-end">Editar</th>  
             </tr>
           </thead>
           <tbody>
@@ -187,6 +188,9 @@ $entradas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   <td class="text-end text-muted">R$ <?= number_format($row['valor_custo'], 2, ',', '.') ?></td>
                   <td class="text-end fw-bold text-primary">
                     R$ <?= number_format($row['valor_custo'] * $row['estoque_atual'], 2, ',', '.') ?>
+                  </td>
+                  <td class="text-end">
+                    <a href="alt_estoque.php?id=<?= $row['id_estoque'] ?>" class="btn btn-sm btn-outline-primary"><i class='bx bx-edit'></i> </a>
                   </td>
                 </tr>
               <?php endforeach; ?>
