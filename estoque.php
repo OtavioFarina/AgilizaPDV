@@ -10,17 +10,9 @@ if (!isset($_SESSION['nome_usuario'])) {
 // Pega o tipo de usuário (1 = ADM, 0 = Comum)
 $tipo_usuario = isset($_SESSION['tipo_usuario']) ? $_SESSION['tipo_usuario'] : 0;
 
-$host = 'localhost';
-$dbname = 'banco';
-$user = 'root';
-$pass = '';
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Erro na conexão: " . $e->getMessage());
-}
+// Usar conexão centralizada
+require_once "config/conexao.php";
+$pdo = $conn; // Alias para manter compatibilidade com o código existente
 
 // --- LÓGICA PARA RETORNAR SABORES (CHAMADA AJAX) ---
 if (isset($_GET['acao']) && $_GET['acao'] === 'get_sabores' && isset($_GET['id_categoria'])) {
@@ -28,7 +20,7 @@ if (isset($_GET['acao']) && $_GET['acao'] === 'get_sabores' && isset($_GET['id_c
     $id_categoria = (int) $_GET['id_categoria'];
 
     try {
-        $stmt = $pdo->prepare("SELECT DISTINCT sabor FROM produto WHERE id_categoria = ? AND sabor <> '' ORDER BY sabor");
+        $stmt = $pdo->prepare("SELECT DISTINCT sabor FROM produto WHERE id_categoria = ? AND sabor <> '' AND ativo = 1 ORDER BY sabor");
         $stmt->execute([$id_categoria]);
         $sabores = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($sabores);
@@ -54,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_categoria'])) {
     $catInfo = $stmtCat->fetch(PDO::FETCH_ASSOC);
     $produto_tipo = $catInfo ? $catInfo['nome_categoria'] : 'Geral';
 
-    $stmtProd = $pdo->prepare("SELECT nome FROM produto WHERE id_categoria = ? AND sabor = ? LIMIT 1");
+    $stmtProd = $pdo->prepare("SELECT nome FROM produto WHERE id_categoria = ? AND sabor = ? AND ativo = 1 LIMIT 1");
     $stmtProd->execute([$id_categoria, $sabor]);
     $prodInfo = $stmtProd->fetch(PDO::FETCH_ASSOC);
 
@@ -100,7 +92,7 @@ $dados_estoque = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // --- CONSULTA PARA CATEGORIAS (Apenas se for ADM para preencher o select) ---
 $categorias = [];
 if ($tipo_usuario == 1) {
-    $sql_categorias = "SELECT id_categoria, nome_categoria FROM categoria ORDER BY nome_categoria";
+    $sql_categorias = "SELECT id_categoria, nome_categoria FROM categoria WHERE ativo = 1 ORDER BY nome_categoria";
     $stmt_categorias = $pdo->query($sql_categorias);
     $categorias = $stmt_categorias->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -118,13 +110,14 @@ if ($tipo_usuario == 1) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="styles/style_estoque.css" />
+    <link rel="stylesheet" href="assets/css/style_estoque.css" />
+    <link href="assets/css/dark_mode.css" rel="stylesheet">
 </head>
 
 <body>
     <div class="top-bar">
         <div class="d-flex align-items-center gap-3">
-            <img class="logo" src="img/logoagilizasemfundo.png" alt="Logo PDV">
+            <img class="logo" src="assets/img/logoagilizasemfundo.png" alt="Logo PDV">
             <h4 class="m-0 fw-bold text-secondary d-none d-md-block">Controle de Estoque</h4>
         </div>
 
@@ -137,6 +130,17 @@ if ($tipo_usuario == 1) {
                     <li><a class="dropdown-item py-2 text-primary fw-bold" href="adm.php"><i class='bx bxs-dashboard'></i>
                             Voltar ao Dashboard</a></li>
                 <?php endif; ?>
+                <li><a class="dropdown-item py-2 text-primary fw-bold" href="vendas.php"><i class='bx bx-cart'></i>
+                        Voltar ao PDV</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <button type="button" class="dropdown-item py-2 text-dark fw-bold" data-bs-toggle="modal"
+                        data-bs-target="#settingsModal">
+                        <i class='bx bx-cog'></i> Configurações
+                    </button>
+                </li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
@@ -257,6 +261,33 @@ if ($tipo_usuario == 1) {
         </div>
     </div>
 
+    <!-- Modal Configurações -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class='bx bx-cog'></i> Configurações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0 fw-bold">Modo Escuro</h6>
+                            <small class="text-muted">Alternar entre tema claro e escuro</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="themeToggle"
+                                style="width: 3em; height: 1.5em; cursor: pointer;">
+                            <label class="form-check-label ms-2" for="themeToggle"><i id="themeIcon"
+                                    class="bx bx-sun fs-4 text-warning"></i></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/settings.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
     <?php if ($tipo_usuario == 1): ?>

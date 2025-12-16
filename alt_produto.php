@@ -6,14 +6,14 @@ if (!isset($_SESSION['nome_usuario']) || (isset($_SESSION['tipo_usuario']) && $_
     exit();
 }
 
-require_once "conexao.php";
+require_once "config/conexao.php";
 $mensagem_swal = "";
 $dados = [];
 
 // Carrega Listas
 try {
-    $categorias = $conn->query("SELECT * FROM categoria ORDER BY nome_categoria")->fetchAll(PDO::FETCH_ASSOC);
-    $fornecedores = $conn->query("SELECT * FROM fornecedor ORDER BY nome_fornecedor")->fetchAll(PDO::FETCH_ASSOC);
+    $categorias = $conn->query("SELECT * FROM categoria WHERE ativo = 1 ORDER BY nome_categoria")->fetchAll(PDO::FETCH_ASSOC);
+    $fornecedores = $conn->query("SELECT * FROM fornecedor WHERE ativo = 1 ORDER BY nome_fornecedor")->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $categorias = [];
     $fornecedores = [];
@@ -61,13 +61,14 @@ if (isset($_POST["alterar"])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link href="styles/style_cad.css" rel="stylesheet">
+    <link href="assets/css/style_cad.css" rel="stylesheet">
+    <link href="assets/css/dark_mode.css" rel="stylesheet">
 </head>
 
 <body>
     <div class="top-bar">
         <div class="d-flex align-items-center gap-3">
-            <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo">
+            <img src="assets/img/logoagilizasemfundo.png" class="logo" alt="Logo">
             <h5 class="m-0 fw-bold text-secondary d-none d-md-block">Administrativo</h5>
         </div>
         <div class="dropdown">
@@ -76,6 +77,15 @@ if (isset($_POST["alterar"])) {
             <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                 <li><a class="dropdown-item py-2 text-primary fw-bold" href="cad_produto.php"><i
                             class='bx bx-arrow-back'></i> Voltar</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <button type="button" class="dropdown-item py-2 text-dark fw-bold" data-bs-toggle="modal"
+                        data-bs-target="#settingsModal">
+                        <i class='bx bx-cog'></i> Configurações
+                    </button>
+                </li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
@@ -142,6 +152,33 @@ if (isset($_POST["alterar"])) {
         </div>
     </div>
 
+    <!-- Modal Configurações -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class='bx bx-cog'></i> Configurações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0 fw-bold">Modo Escuro</h6>
+                            <small class="text-muted">Alternar entre tema claro e escuro</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="themeToggle"
+                                style="width: 3em; height: 1.5em; cursor: pointer;">
+                            <label class="form-check-label ms-2" for="themeToggle"><i id="themeIcon"
+                                    class="bx bx-sun fs-4 text-warning"></i></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/settings.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script> <?php if (!empty($mensagem_swal))

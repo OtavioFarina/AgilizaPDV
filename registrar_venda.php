@@ -1,5 +1,5 @@
 <?php
-require_once "conexao.php";
+require_once "config/conexao.php";
 
 // 🚨 CONFIGURAÇÃO DO WEBHOOK 🚨
 // MUDAR: Substitua esta URL pelo Webhook Address do seu nó n8n

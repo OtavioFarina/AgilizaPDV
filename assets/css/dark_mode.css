@@ -1,0 +1,564 @@
+/* ==========================================================================
+   AGILIZA PDV - DESIGN SYSTEM (DARK MODE) 🌑
+   Arquivo: assets/css/dark_mode.css
+   Descrição: Centraliza todas as regras visuais para o tema escuro.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. VARIÁVEIS DE CORES (A Base do Sistema)
+   Definimos as cores para o tema claro (padrão) e as substituições para o escuro.
+   -------------------------------------------------------------------------- */
+:root {
+    /* --- Light Mode (Padrão) --- */
+    --bg-body: #f8f9fa;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --text-primary: #1e293b;
+    /* Slate 800 */
+    --text-secondary: #64748b;
+    /* Slate 500 */
+    --border-color: #e2e8f0;
+    /* Slate 200 */
+    --accent-color: #3b82f6;
+    /* Blue 500 */
+    --modal-overlay: rgba(0, 0, 0, 0.5);
+    --btn-close-filter: none;
+}
+
+/* Quando o corpo do site tiver o atributo data-theme="dark" */
+[data-theme="dark"] {
+    /* --- Dark Mode (Paleta Slate Profissional) --- */
+    --bg-body: #0f172a;
+    /* Slate 900: Fundo principal */
+    --bg-card: #1e293b;
+    /* Slate 800: Fundo de cards */
+    --bg-input: #0f172a;
+    /* Fundo de inputs (profundidade) */
+    --text-primary: #f1f5f9;
+    /* Slate 100: Texto principal */
+    --text-secondary: #94a3b8;
+    /* Slate 400: Texto secundário */
+    --border-color: #334155;
+    /* Slate 700: Bordas */
+    --accent-color: #60a5fa;
+    /* Blue 400: Azul Neon */
+
+    /* Inverte a cor do ícone de fechar (X) dos modais */
+    --btn-close-filter: invert(1) grayscale(100%) brightness(200%);
+
+    /* Força controles nativos (calendário, relógio) a ficarem escuros */
+    color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------------
+   2. TRANSIÇÕES GLOBAIS
+   Suaviza a troca de cores.
+   -------------------------------------------------------------------------- */
+body,
+.card,
+.modal-content,
+.navbar,
+.table,
+th,
+td,
+.cart-panel,
+.product-panel,
+.btn-produto,
+input,
+.form-control,
+.form-select,
+.closing-card,
+.kpi-card {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* --------------------------------------------------------------------------
+   3. OVERRIDES GERAIS (Correção de Fundos Brancos)
+   -------------------------------------------------------------------------- */
+
+[data-theme="dark"] body {
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Lista de elementos que devem ter o fundo Cinza Escuro (Slate 800) */
+[data-theme="dark"] .card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-light,
+[data-theme="dark"] .list-group-item,
+/* PDV */
+[data-theme="dark"] .cart-panel,
+[data-theme="dark"] .product-panel,
+[data-theme="dark"] .btn-produto,
+[data-theme="dark"] .product-card-modal,
+/* Admin e Históricos */
+[data-theme="dark"] .card-filter,
+[data-theme="dark"] .card-form,
+[data-theme="dark"] .form-card,
+[data-theme="dark"] .table-container {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ajuste específico para os Botões de Produto (Hover) */
+[data-theme="dark"] .btn-produto:hover {
+    background-color: #334155 !important;
+    border-color: var(--accent-color) !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. CORREÇÃO DE TEXTOS
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .text-dark,
+[data-theme="dark"] .text-secondary,
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] small,
+[data-theme="dark"] .small {
+    color: var(--text-secondary) !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. AJUSTES ESPECÍFICOS: PDV
+   -------------------------------------------------------------------------- */
+/* Painel de Produtos - Correção de Layout (Grid) */
+[data-theme="dark"] .product-panel {
+    background-color: var(--bg-card) !important;
+    border-radius: 16px !important;
+
+    /* CORREÇÃO AQUI: Reduzimos o padding para o mínimo necessário */
+    padding: 10px !important;
+    /* Era 25px, baixou para 10px para não quebrar o grid */
+
+    /* Removemos a borda física para ganhar +2px de largura útil */
+    border: none !important;
+
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .product-panel .panel-title {
+    margin-bottom: 20px !important;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Footer do Carrinho */
+[data-theme="dark"] .cart-total-container {
+    background-color: var(--bg-card) !important;
+    border-top: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .cart-total-container span {
+    color: var(--text-primary) !important;
+}
+
+/* Lixeira do Carrinho */
+[data-theme="dark"] .btn-light {
+    background-color: transparent !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .btn-light:hover {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+    color: #f87171 !important;
+    border-color: #f87171 !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. MODAL DE PAGAMENTO (PDV)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] #modalPagamentoPDV .modal-content {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] #modalPagamentoPDV .card.bg-light {
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] #modalPagamentoPDV .input-group-text.bg-white,
+[data-theme="dark"] #modalPagamentoPDV .form-control {
+    background-color: #0f172a !important;
+    border-color: var(--border-color) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] #modalPagamentoPDV #dinheiroPDV {
+    color: #4ade80 !important;
+}
+
+/* Grupo de Pagamento em Dinheiro */
+[data-theme="dark"] #modalPagamentoPDV .payment-group-box {
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+[data-theme="dark"] #modalPagamentoPDV .payment-label {
+    color: var(--text-secondary) !important;
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* Card de Troco */
+[data-theme="dark"] #modalPagamentoPDV .rounded.border.bg-white {
+    background-color: var(--bg-input) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Botões de Atalho */
+[data-theme="dark"] .btn-outline-secondary.btn-shortcut {
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-outline-secondary.btn-shortcut:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+/* --------------------------------------------------------------------------
+   7. ELEMENTOS DE FORMULÁRIO (GLOBAL)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .input-group-text {
+    background-color: var(--bg-input) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+}
+
+[data-theme="dark"] .input-group-text {
+    background-color: #334155 !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* --------------------------------------------------------------------------
+   8. COMPONENTES DE UI
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: var(--border-color) !important;
+    background-color: var(--bg-card) !important;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: var(--btn-close-filter);
+}
+
+[data-theme="dark"] .list-group-item {
+    background-color: transparent !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .pdv-header {
+    background-color: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-body);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+}
+
+/* --------------------------------------------------------------------------
+   9. ESTOQUE, HISTÓRICO & CADASTROS
+   -------------------------------------------------------------------------- */
+/* Containers */
+[data-theme="dark"] .card-filter,
+[data-theme="dark"] .table-container {
+    padding: 25px !important;
+}
+
+/* Cabeçalho da Tabela */
+[data-theme="dark"] .table thead.table-light th,
+[data-theme="dark"] .table thead th {
+    background-color: var(--bg-input) !important;
+    color: var(--text-secondary) !important;
+    border-bottom: 2px solid var(--border-color) !important;
+}
+
+/* Linhas da Tabela */
+[data-theme="dark"] .table tbody td,
+[data-theme="dark"] .table tbody th {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover td {
+    background-color: #334155 !important;
+    color: #fff !important;
+}
+
+/* Badges */
+[data-theme="dark"] .badge.bg-secondary,
+[data-theme="dark"] .badge.bg-light {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Badge de Sucesso (Entrada +20) */
+[data-theme="dark"] .badge.bg-success {
+    background-color: rgba(74, 222, 128, 0.15) !important;
+    color: #4ade80 !important;
+    border: 1px solid rgba(74, 222, 128, 0.3) !important;
+}
+
+/* NavBar Topo */
+[data-theme="dark"] .top-bar {
+    background-color: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .top-bar h4 {
+    color: var(--text-primary) !important;
+}
+
+/* Dropdowns */
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #334155 !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-top: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .dropdown-item.text-primary {
+    color: #60a5fa !important;
+}
+
+[data-theme="dark"] .dropdown-item.text-danger {
+    color: #f87171 !important;
+}
+
+/* --------------------------------------------------------------------------
+   10. DASHBOARD ADMIN
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .kpi-card {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .kpi-title {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .kpi-value {
+    color: var(--text-primary) !important;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .text-success {
+    color: #4ade80 !important;
+}
+
+[data-theme="dark"] .text-primary {
+    color: #60a5fa !important;
+}
+
+[data-theme="dark"] .text-danger {
+    color: #f87171 !important;
+}
+
+[data-theme="dark"] .chart-container,
+[data-theme="dark"] .btn-quick {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .btn-quick:hover {
+    background-color: #334155 !important;
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] .btn-quick i {
+    color: var(--accent-color) !important;
+}
+
+[data-theme="dark"] #menuDropdown img {
+    filter: invert(1) brightness(200%);
+}
+
+/* --------------------------------------------------------------------------
+   11. SWEETALERT2
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .swal2-popup {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 16px !important;
+}
+
+[data-theme="dark"] .swal2-title,
+[data-theme="dark"] .swal2-html-container,
+[data-theme="dark"] .swal2-close {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .swal2-input,
+[data-theme="dark"] .swal2-textarea {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .swal2-success-circular-line-left,
+[data-theme="dark"] .swal2-success-circular-line-right,
+[data-theme="dark"] .swal2-success-fix {
+    background-color: transparent !important;
+}
+
+/* --------------------------------------------------------------------------
+   12. PÁGINA DE RELATÓRIO DE CAIXA
+   Correção dos cards de fechamento e acordeão.
+   -------------------------------------------------------------------------- */
+
+/* Card de Fechamento (Cada registro da lista) */
+[data-theme="dark"] .closing-card {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Cabeçalho do Card (Onde fica o nome do vendedor) */
+[data-theme="dark"] .closing-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Corpo dos Detalhes (Accordion aberto) */
+[data-theme="dark"] .closing-body {
+    background-color: var(--bg-input) !important;
+    /* Mais escuro para contraste */
+    border-top: none;
+}
+
+/* Texto dentro do header do card */
+[data-theme="dark"] .closing-header .text-dark {
+    color: var(--text-primary) !important;
+}
+
+/* Itens da lista de resumo financeiro */
+[data-theme="dark"] .closing-body .list-group-item {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Tabela de Produtos dentro do Detalhe */
+[data-theme="dark"] .table-details {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .table-details th {
+    color: var(--text-primary) !important;
+}
+
+/* Alerta de Informação (Usado para o Vendedor) */
+[data-theme="dark"] .alert-info {
+    background-color: rgba(13, 202, 240, 0.15) !important;
+    /* Ciano transparente */
+    color: #0dcaf0 !important;
+    /* Ciano neon */
+    border-color: rgba(13, 202, 240, 0.3) !important;
+}
+
+/* =========================================
+   13. PÁGINA LIXEIRA (ABAS / TABS)
+   ========================================= */
+
+/* Estilo das Abas (Tabs) */
+[data-theme="dark"] .nav-tabs {
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+/* Link da aba (inativo) */
+[data-theme="dark"] .nav-tabs .nav-link {
+    color: var(--text-secondary) !important;
+    border: 1px solid transparent;
+}
+
+/* Hover na aba */
+[data-theme="dark"] .nav-tabs .nav-link:hover {
+    border-color: var(--border-color) !important;
+    background-color: #334155 !important;
+    color: var(--text-primary) !important;
+}
+
+/* Aba Ativa (Selecionada) */
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    color: var(--accent-color) !important;
+    /* Azul Neon */
+    background-color: var(--bg-card) !important;
+    /* Mesma cor do card da tabela */
+    border-color: var(--border-color) var(--border-color) transparent !important;
+    font-weight: 600;
+}
+
+/* Botão de Restaurar (Verde) */
+[data-theme="dark"] .btn-success.text-white {
+    background-color: #198754 !important;
+    /* Verde Bootstrap original */
+    border: none;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .btn-success.text-white:hover {
+    background-color: #157347 !important;
+}

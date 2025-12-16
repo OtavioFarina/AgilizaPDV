@@ -1,7 +1,0 @@
-usuario: Vendedor // usuario comum
-
-senha: vendedor
-
-usuario: Admin // administrador
-
-senha: admin

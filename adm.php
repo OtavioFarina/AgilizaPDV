@@ -7,7 +7,7 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['tipo_usuario'] != 1) {
   exit();
 }
 
-require_once "conexao.php";
+require_once "config/conexao.php";
 
 // Definir fuso horário para garantir datas corretas
 date_default_timezone_set('America/Sao_Paulo');
@@ -129,18 +129,18 @@ foreach ($dadosPag as $d) {
 
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles/style_adm.css">
-</head>
+  <link rel="stylesheet" href="assets/css/style_adm.css">
+  <link href="assets/css/dark_mode.css" rel="stylesheet">
 
 <body>
   <div class="top-bar d-flex align-items-center justify-content-between px-4 py-2">
     <div class="d-flex align-items-center gap-3">
-      <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
+      <img src="assets/img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
       <h4 class="m-0 fw-bold text-secondary d-none d-md-block">Dashboard Administrativo</h4>
     </div>
     <div class="dropdown">
-      <button class="btn" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="img/3riscos.png" alt="Menu" style="height:25px;">
+      <button class="btn btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown">
+        <i class='bx bx-menu fs-3'></i>
       </button>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
         <li><a class="dropdown-item py-2" href="vendas.php"><i class='bx bx-cart'></i> Vendas
@@ -151,6 +151,18 @@ foreach ($dadosPag as $d) {
             Histórico de Vendas</a></li>
         <li><a class="dropdown-item py-2" href="consulta_caixa.php"><i class="bx bx-basket"></i>
             Relatório de Caixa</a></li>
+        <li>
+          <a class="dropdown-item py-2" href="lixeira.php"><i class='bx bx-trash'></i> Lixeira / Restaurar</a>
+        </li>
+        <li>
+          <button type="button" class="dropdown-item py-2 text-primary fw-bold" data-bs-toggle="modal"
+            data-bs-target="#settingsModal">
+            <i class='bx bx-cog'></i> Configurações
+          </button>
+        </li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
         <li><a class="dropdown-item py-2 text-danger" href="logout.php"><i class='bx bx-log-out'></i> Sair</a></li>
       </ul>
     </div>
@@ -177,7 +189,8 @@ foreach ($dadosPag as $d) {
       </div>
 
       <div class="col-md-4">
-        <div class="kpi-card position-relative" style="border-left-color: #dc3545; cursor: pointer;" id="btnEstoqueBaixo" role="button">
+        <div class="kpi-card position-relative" style="border-left-color: #dc3545; cursor: pointer;"
+          id="btnEstoqueBaixo" role="button">
           <div class="kpi-title">Estoque Baixo (≤ 5)</div>
           <div class="kpi-value text-danger"><?= $qtdBaixoEstoque ?> <small style="font-size: 1rem;">itens</small></div>
           <i class='bx bx-error-circle kpi-icon' style="color: #dc3545;"></i>
@@ -286,14 +299,41 @@ foreach ($dadosPag as $d) {
     </div>
   </div>
 
+  <!-- Modal Configurações -->
+  <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold"><i class='bx bx-cog'></i> Configurações</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="mb-0 fw-bold">Modo Escuro</h6>
+              <small class="text-muted">Alternar entre tema claro e escuro</small>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="themeToggle"
+                style="width: 3em; height: 1.5em; cursor: pointer;">
+              <label class="form-check-label ms-2" for="themeToggle"><i id="themeIcon"
+                  class="bx bx-sun fs-4 text-warning"></i></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/settings.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
     // Evento de clique no card de Estoque Baixo
-    document.getElementById('btnEstoqueBaixo').addEventListener('click', function() {
+    document.getElementById('btnEstoqueBaixo').addEventListener('click', function () {
       const produtosBaixo = <?= json_encode($produtosBaixoEstoque) ?>;
       const listaEl = document.getElementById('estoqueList');
-      
+
       if (produtosBaixo.length === 0) {
         listaEl.innerHTML = '<p class="text-muted text-center py-5">Nenhum produto com estoque crítico no momento.</p>';
       } else {
@@ -319,7 +359,7 @@ foreach ($dadosPag as $d) {
         html += '</div>';
         listaEl.innerHTML = html;
       }
-      
+
       // Abrir modal
       const modal = new bootstrap.Modal(document.getElementById('estoqueModal'));
       modal.show();

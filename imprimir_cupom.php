@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "conexao.php";
+require_once "config/conexao.php";
 
 // Verifica login
 if (!isset($_SESSION['nome_usuario'])) {

@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once "conexao.php";
+require_once "config/conexao.php";
 
 if (isset($_POST['bt_login'])) {
     // Verifica se todos os campos foram preenchidos, incluindo a loja
@@ -12,8 +12,9 @@ if (isset($_POST['bt_login'])) {
         $id_loja_selecionada = (int) $_POST['id_estabelecimento']; // Loja escolhida no select
 
         try {
-            // Buscamos também o id_estabelecimento do usuário para comparar
-            $consulta = $conn->prepare("SELECT id_usuario, tipo_usuario, nome_usuario, senha, id_estabelecimento FROM usuarios WHERE nome_usuario = :nome_usuario");
+            // CORREÇÃO AQUI: Adicionado "AND ativo = 1"
+            // Agora só busca usuários que não foram excluídos
+            $consulta = $conn->prepare("SELECT id_usuario, tipo_usuario, nome_usuario, senha, id_estabelecimento FROM usuarios WHERE nome_usuario = :nome_usuario AND ativo = 1");
             $consulta->bindValue(':nome_usuario', $nome_usuario);
             $consulta->execute();
             $row = $consulta->fetch(PDO::FETCH_ASSOC);
@@ -23,10 +24,8 @@ if (isset($_POST['bt_login'])) {
                 if (password_verify($senha, $row['senha'])) {
 
                     // 2. Verifica permissões de acesso ao estabelecimento
-                    // Admin (tipo_usuario = 1) pode acessar qualquer estabelecimento
-                    // Vendedor (tipo_usuario = 0) só pode acessar seu estabelecimento vinculado
                     $pode_acessar = false;
-                    
+
                     if ($row['tipo_usuario'] == 1) {
                         // Admin: pode acessar qualquer estabelecimento
                         $pode_acessar = true;
@@ -67,7 +66,7 @@ if (isset($_POST['bt_login'])) {
                           </script>";
                 }
             } else {
-                // Usuário não encontrado
+                // Usuário não encontrado (ou está inativo/excluído)
                 echo "<script>
                         alert('Usuário não encontrado!');
                         window.location.href = 'index.php';

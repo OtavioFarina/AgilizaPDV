@@ -13,7 +13,7 @@ if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] != 1) {
     exit();
 }
 
-require_once "conexao.php";
+require_once "config/conexao.php";
 $mensagem_swal = "";
 $dados = [];
 
@@ -59,13 +59,13 @@ if (isset($_POST["alterar"])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link href="styles/style_cad.css" rel="stylesheet">
+    <link href="assets/css/style_cad.css" rel="stylesheet">
 </head>
 
 <body>
     <div class="top-bar">
         <div class="d-flex align-items-center gap-3">
-            <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo">
+            <img src="assets/img/logoagilizasemfundo.png" class="logo" alt="Logo">
             <h5 class="m-0 fw-bold text-secondary d-none d-md-block">Administrativo</h5>
         </div>
         <div class="dropdown">
@@ -91,24 +91,28 @@ if (isset($_POST["alterar"])) {
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">Produto</label>
-                        <input type="text" class="form-control" value="<?= htmlspecialchars($dados['produto']) ?>" disabled>
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($dados['produto']) ?>"
+                            disabled>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Sabor</label>
-                        <input type="text" class="form-control" value="<?= htmlspecialchars($dados['sabor']) ?>" disabled>
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($dados['sabor']) ?>"
+                            disabled>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Categoria</label>
-                        <input type="text" class="form-control" value="<?= htmlspecialchars($dados['tipo']) ?>" disabled>
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($dados['tipo']) ?>"
+                            disabled>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Data de Entrada</label>
-                        <input type="text" class="form-control" value="<?= date('d/m/Y H:i', strtotime($dados['data'])) ?>" disabled>
+                        <input type="text" class="form-control"
+                            value="<?= date('d/m/Y H:i', strtotime($dados['data'])) ?>" disabled>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Quantidade Entrada *</label>
-                        <input type="number" class="form-control" name="estoque_atual" 
-                            value="<?= (int)$dados['estoque_atual'] ?>" min="1" required>
+                        <input type="number" class="form-control" name="estoque_atual"
+                            value="<?= (int) $dados['estoque_atual'] ?>" min="1" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Custo Unitário (R$) *</label>

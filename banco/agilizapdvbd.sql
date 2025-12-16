@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Tempo de geração: 27/11/2025 às 05:36
--- Versão do servidor: 9.1.0
--- Versão do PHP: 8.3.14
+-- Tempo de geração: 15/12/2025 às 20:17
+-- Versão do servidor: 8.4.7
+-- Versão do PHP: 8.3.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,10 +18,10 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Banco de dados: `banco`
+-- Banco de dados: `agilizapdvbd`
 --
-CREATE DATABASE IF NOT EXISTS `banco` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `banco`;
+CREATE DATABASE IF NOT EXISTS `agilizapdvbd` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE `agilizapdvbd`;
 
 -- --------------------------------------------------------
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `caixa_status` (
   `valor_inicial` decimal(10,2) DEFAULT '0.00',
   `data_status` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_status`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `caixa_status`
@@ -62,7 +62,10 @@ INSERT INTO `caixa_status` (`id_status`, `status`, `valor_inicial`, `data_status
 (17, 'aberto', 50.00, '2025-11-24 01:06:59'),
 (18, 'fechado', 0.00, '2025-11-24 01:08:26'),
 (19, 'aberto', 2.50, '2025-11-24 01:10:31'),
-(20, 'fechado', 0.00, '2025-11-24 01:11:05');
+(20, 'fechado', 0.00, '2025-11-24 01:11:05'),
+(21, 'aberto', 50.00, '2025-12-14 17:02:13'),
+(22, 'fechado', 0.00, '2025-12-14 17:03:04'),
+(23, 'aberto', 50.00, '2025-12-15 15:53:46');
 
 -- --------------------------------------------------------
 
@@ -74,26 +77,28 @@ DROP TABLE IF EXISTS `categoria`;
 CREATE TABLE IF NOT EXISTS `categoria` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
   `nome_categoria` varchar(100) NOT NULL,
+  `ativo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id_categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `categoria`
 --
 
-INSERT INTO `categoria` (`id_categoria`, `nome_categoria`) VALUES
-(2, 'Pote 2.5L'),
-(3, 'Pote 5L'),
-(4, 'Copinho'),
-(5, 'Torta'),
-(6, 'Bebida'),
-(7, 'Picolé - Slechi'),
-(8, 'Picolé - Mozafiato'),
-(9, 'Ituzinho - Slechi'),
-(10, 'Ituzinho - Mozafiato'),
-(11, 'Pote - 5L Trufado'),
-(12, 'Pote 2.5L Trufado'),
-(13, 'Paleta');
+INSERT INTO `categoria` (`id_categoria`, `nome_categoria`, `ativo`) VALUES
+(2, 'Pote 2.5L', 1),
+(3, 'Pote 5L', 1),
+(4, 'Copinho', 1),
+(5, 'Torta', 1),
+(6, 'Bebida', 1),
+(7, 'Picolé - Slechi', 1),
+(8, 'Picolé - Mozafiato', 1),
+(9, 'Ituzinho - Slechi', 1),
+(10, 'Ituzinho - Mozafiato', 1),
+(11, 'Pote - 5L Trufado', 1),
+(12, 'Pote 2.5L Trufado', 1),
+(13, 'Paleta', 1),
+(15, 'Teste', 0);
 
 -- --------------------------------------------------------
 
@@ -110,6 +115,7 @@ CREATE TABLE IF NOT EXISTS `estabelecimento` (
   `bairro` varchar(255) NOT NULL,
   `cidade` varchar(120) NOT NULL,
   `estado` char(2) NOT NULL,
+  `ativo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id_estabelecimento`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -117,9 +123,9 @@ CREATE TABLE IF NOT EXISTS `estabelecimento` (
 -- Despejando dados para a tabela `estabelecimento`
 --
 
-INSERT INTO `estabelecimento` (`id_estabelecimento`, `nome_estabelecimento`, `cep`, `rua`, `bairro`, `cidade`, `estado`) VALUES
-(1, 'Atacadão São Roque', '13722-276', 'Rua São José', 'Jardim São Roque', 'São José do Rio Pardo', 'SP'),
-(2, 'Atacadão Buenos Aires', '13727-096', 'Rua Maria Teresa de Oliveira Rocha', 'Buenos Aires', 'São José do Rio Pardo', 'SP');
+INSERT INTO `estabelecimento` (`id_estabelecimento`, `nome_estabelecimento`, `cep`, `rua`, `bairro`, `cidade`, `estado`, `ativo`) VALUES
+(1, 'Atacadão São Roque', '13722-276', 'Rua São José', 'Jardim São Roque', 'São José do Rio Pardo', 'SP', 1),
+(2, 'Atacadão Buenos Aires', '13727-096', 'Rua Maria Teresa de Oliveira Rocha', 'Buenos Aires', 'São José do Rio Pardo', 'SP', 1);
 
 -- --------------------------------------------------------
 
@@ -138,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `estoque` (
   `movimentacao` enum('Entrada','Saída') NOT NULL,
   `valor_custo` decimal(10,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id_estoque`)
-) ENGINE=MyISAM AUTO_INCREMENT=239 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=241 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `estoque`
@@ -375,7 +381,9 @@ INSERT INTO `estoque` (`id_estoque`, `produto`, `sabor`, `tipo`, `estoque_atual`
 (235, 'Picolé - Slechi', 'Chocolate', 'Picolé - Slechi', 7, '2025-11-24 01:10:49', 'Saída', 0.00),
 (236, 'Pote 2.5L', 'Laka Morango Chocolate', 'Pote 2.5L', 1, '2025-11-24 01:10:55', 'Saída', 0.00),
 (237, 'Pote 2.5L', 'Abacaxi Limão Maracuja', 'Pote 2.5L', 1, '2025-11-24 01:10:55', 'Saída', 0.00),
-(238, 'Bebida', 'Água sem Gás', 'Bebida', 1, '2025-11-24 01:11:01', 'Saída', 0.00);
+(238, 'Bebida', 'Água sem Gás', 'Bebida', 1, '2025-11-24 01:11:01', 'Saída', 0.00),
+(239, 'Pote - 5L Trufado', 'Morango Trufado', 'Pote - 5L Trufado', 1, '2025-12-14 17:02:32', 'Saída', 0.00),
+(240, 'Pote - 5L', 'Charlote Ninho e Sensação', 'Pote 5L', 1, '2025-12-15 16:14:14', 'Saída', 0.00);
 
 -- --------------------------------------------------------
 
@@ -396,7 +404,7 @@ CREATE TABLE IF NOT EXISTS `fechamento_caixa` (
   `total_pix` decimal(10,2) DEFAULT '0.00',
   `valor_final_informado` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`id_fechamento`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `fechamento_caixa`
@@ -412,7 +420,8 @@ INSERT INTO `fechamento_caixa` (`id_fechamento`, `data_abertura`, `data_fechamen
 (7, '2025-11-23 01:01:44', '2025-11-23 01:03:45', 'Vendedor', 100.00, 145.00, 0.00, 0.00, 2.50, 0.00),
 (8, '2025-11-23 01:04:08', '2025-11-23 01:04:40', 'Vendedor2', 60.00, 0.00, 44.00, 150.00, 117.00, 0.00),
 (9, '2025-11-24 01:06:59', '2025-11-24 01:08:26', 'Vendedor', 50.00, 109.00, 99.50, 42.00, 24.00, 0.00),
-(10, '2025-11-24 01:10:31', '2025-11-24 01:11:05', 'Vendedor2', 2.50, 20.50, 76.00, 126.00, 0.00, 0.00);
+(10, '2025-11-24 01:10:31', '2025-11-24 01:11:05', 'Vendedor2', 2.50, 20.50, 76.00, 126.00, 0.00, 0.00),
+(11, '2025-12-14 17:02:13', '2025-12-14 17:03:04', 'Vendedor', 50.00, 75.00, 0.00, 0.00, 0.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -452,16 +461,18 @@ CREATE TABLE IF NOT EXISTS `fornecedor` (
   `telefone` varchar(20) DEFAULT NULL,
   `email` varchar(120) DEFAULT NULL,
   `endereco` varchar(200) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id_fornecedor`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `fornecedor`
 --
 
-INSERT INTO `fornecedor` (`id_fornecedor`, `nome_fornecedor`, `cnpj`, `telefone`, `email`, `endereco`) VALUES
-(1, 'Rogério', '75.793.400/0001-09', '(13) 2483-9745', 'rogerio@hotmail.com', 'Litora'),
-(2, 'Francisco Parra', '75.616.214/0001-96', '(19) 29017-7648', 'parrafrancisco@gmail.com', 'Sorocaba');
+INSERT INTO `fornecedor` (`id_fornecedor`, `nome_fornecedor`, `cnpj`, `telefone`, `email`, `endereco`, `ativo`) VALUES
+(1, 'Rogério', '75.793.400/0001-09', '(13) 2483-9745', 'rogerio@hotmail.com', 'Litora', 1),
+(2, 'Francisco Parra', '75.616.214/0001-96', '(19) 29017-7648', 'parrafrancisco@gmail.com', 'Sorocaba', 1),
+(3, 'Teste', '92.838.343/0001-48', '(13) 33361-7383', 'teste@gmail.com', 'teste', 0);
 
 -- --------------------------------------------------------
 
@@ -478,50 +489,52 @@ CREATE TABLE IF NOT EXISTS `produto` (
   `id_fornecedor` int NOT NULL,
   `preco_venda` decimal(10,2) NOT NULL,
   `preco_compra` decimal(10,2) NOT NULL,
+  `ativo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id_produto`),
   KEY `id_categoria` (`id_categoria`),
   KEY `id_fornecedor` (`id_fornecedor`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `produto`
 --
 
-INSERT INTO `produto` (`id_produto`, `nome`, `sabor`, `id_categoria`, `id_fornecedor`, `preco_venda`, `preco_compra`) VALUES
-(5, 'Pote 2.5L Trufado', 'Ninho Trufado', 12, 1, 42.00, 20.00),
-(6, 'Pote 2.5L', 'Laka Morango Chocolate', 2, 2, 38.00, 18.00),
-(7, 'Ituzinho - Slechi', 'Limão', 9, 2, 2.50, 0.75),
-(8, 'Ituzinho - Slechi', 'Abacaxi', 9, 2, 2.50, 0.75),
-(9, 'Ituzinho - Slechi', 'Uva', 9, 2, 2.50, 0.75),
-(10, 'Ituzinho - Mozafiato', 'Chocolate Trufado', 10, 1, 3.00, 1.00),
-(11, 'Ituzinho - Mozafiato', 'Ninho com Morango', 10, 1, 3.00, 1.00),
-(12, 'Ituzinho - Mozafiato', 'Doce de Leite', 10, 1, 3.00, 1.00),
-(13, 'Paleta', 'Musse Branco', 13, 2, 14.00, 6.00),
-(14, 'Paleta', 'Pistache', 13, 2, 14.00, 6.00),
-(15, 'Paleta', 'Paçoca', 13, 2, 14.00, 6.00),
-(16, 'Copinho', 'Chocolate', 4, 1, 12.00, 5.00),
-(17, 'Copinho', 'Açaí com leite Condensado', 4, 1, 12.00, 5.00),
-(18, 'Copinho', 'Leitinho Trufado', 4, 1, 12.00, 5.00),
-(19, 'Bebida', 'Água sem Gás', 6, 2, 3.00, 0.50),
-(20, 'Bebida', 'Água com Gás', 6, 1, 3.00, 0.50),
-(21, 'Picolé - Mozafiato', 'Abacati', 8, 2, 2.50, 0.50),
-(22, 'Picolé - Mozafiato', 'Milho Verde', 8, 2, 2.50, 0.50),
-(23, 'Picolé - Mozafiato', 'Coco Branco', 8, 2, 2.50, 0.50),
-(24, 'Picolé - Slechi', 'Chocolate', 7, 1, 2.50, 0.50),
-(25, 'Picolé - Slechi', 'Leite Condensado', 7, 1, 2.50, 0.50),
-(26, 'Picolé - Slechi', 'Goiaba', 7, 1, 2.50, 0.50),
-(27, 'Pote - 5L Trufado', 'Ninho Trufado', 11, 2, 75.00, 46.00),
-(28, 'Pote - 5L Trufado', 'Morango Trufado', 11, 2, 75.00, 46.00),
-(29, 'Pote - 5L Trufado', 'Ninho Trufado com Brigadeiro', 11, 2, 75.00, 46.00),
-(30, 'Pote 2.5L', 'Abacaxi Limão Maracuja', 2, 2, 38.00, 18.00),
-(31, 'Pote 2.5L', 'Charlote Ninho e Sensação', 2, 2, 38.00, 18.00),
-(32, 'Pote 2.5L Trufado', 'Morango Trufado', 12, 1, 42.00, 20.00),
-(33, 'Pote 2.5L Trufado', 'Ninho Trufado com Brigadeiro', 12, 2, 42.00, 20.00),
-(34, 'Pote - 5L', 'Ninho Brigadeiro e Chocolate', 3, 1, 65.00, 20.00),
-(35, 'Pote - 5L', 'Charlote Ninho e Sensação', 3, 1, 65.00, 20.00),
-(36, 'Pote - 5L', 'Ovomaltine Morango e Ninho', 3, 1, 65.00, 20.00),
-(37, 'Torta', 'Amêndoas', 5, 2, 150.00, 75.00),
-(38, 'Torta', 'Pistache', 5, 1, 150.00, 75.00);
+INSERT INTO `produto` (`id_produto`, `nome`, `sabor`, `id_categoria`, `id_fornecedor`, `preco_venda`, `preco_compra`, `ativo`) VALUES
+(5, 'Pote 2.5L Trufado', 'Ninho Trufado', 12, 1, 42.00, 20.00, 1),
+(6, 'Pote 2.5L', 'Laka Morango Chocolate', 2, 2, 38.00, 18.00, 1),
+(7, 'Ituzinho - Slechi', 'Limão', 9, 2, 2.50, 0.75, 1),
+(8, 'Ituzinho - Slechi', 'Abacaxi', 9, 2, 2.50, 0.75, 1),
+(9, 'Ituzinho - Slechi', 'Uva', 9, 2, 2.50, 0.75, 1),
+(10, 'Ituzinho - Mozafiato', 'Chocolate Trufado', 10, 1, 3.00, 1.00, 1),
+(11, 'Ituzinho - Mozafiato', 'Ninho com Morango', 10, 1, 3.00, 1.00, 1),
+(12, 'Ituzinho - Mozafiato', 'Doce de Leite', 10, 1, 3.00, 1.00, 1),
+(13, 'Paleta', 'Musse Branco', 13, 2, 14.00, 6.00, 1),
+(14, 'Paleta', 'Pistache', 13, 2, 14.00, 6.00, 1),
+(15, 'Paleta', 'Paçoca', 13, 2, 14.00, 6.00, 1),
+(16, 'Copinho', 'Chocolate', 4, 1, 12.00, 5.00, 1),
+(17, 'Copinho', 'Açaí com leite Condensado', 4, 1, 12.00, 5.00, 1),
+(18, 'Copinho', 'Leitinho Trufado', 4, 1, 12.00, 5.00, 1),
+(19, 'Bebida', 'Água sem Gás', 6, 2, 3.00, 0.50, 1),
+(20, 'Bebida', 'Água com Gás', 6, 1, 3.00, 0.50, 1),
+(21, 'Picolé - Mozafiato', 'Abacati', 8, 2, 2.50, 0.50, 1),
+(22, 'Picolé - Mozafiato', 'Milho Verde', 8, 2, 2.50, 0.50, 1),
+(23, 'Picolé - Mozafiato', 'Coco Branco', 8, 2, 2.50, 0.50, 1),
+(24, 'Picolé - Slechi', 'Chocolate', 7, 1, 2.50, 0.50, 1),
+(25, 'Picolé - Slechi', 'Leite Condensado', 7, 1, 2.50, 0.50, 1),
+(26, 'Picolé - Slechi', 'Goiaba', 7, 1, 2.50, 0.50, 1),
+(27, 'Pote - 5L Trufado', 'Ninho Trufado', 11, 2, 75.00, 46.00, 1),
+(28, 'Pote - 5L Trufado', 'Morango Trufado', 11, 2, 75.00, 46.00, 1),
+(29, 'Pote - 5L Trufado', 'Ninho Trufado com Brigadeiro', 11, 2, 75.00, 46.00, 1),
+(30, 'Pote 2.5L', 'Abacaxi Limão Maracuja', 2, 2, 38.00, 18.00, 1),
+(31, 'Pote 2.5L', 'Charlote Ninho e Sensação', 2, 2, 38.00, 18.00, 1),
+(32, 'Pote 2.5L Trufado', 'Morango Trufado', 12, 1, 42.00, 20.00, 1),
+(33, 'Pote 2.5L Trufado', 'Ninho Trufado com Brigadeiro', 12, 2, 42.00, 20.00, 1),
+(34, 'Pote - 5L', 'Ninho Brigadeiro e Chocolate', 3, 1, 65.00, 20.00, 1),
+(35, 'Pote - 5L', 'Charlote Ninho e Sensação', 3, 1, 65.00, 20.00, 1),
+(36, 'Pote - 5L', 'Ovomaltine Morango e Ninho', 3, 1, 65.00, 20.00, 1),
+(37, 'Torta', 'Amêndoas', 5, 2, 150.00, 75.00, 1),
+(38, 'Torta', 'Pistache', 5, 1, 150.00, 75.00, 1),
+(39, 'teste', 'teste', 15, 3, 100.00, 80.00, 0);
 
 -- --------------------------------------------------------
 
@@ -538,7 +551,7 @@ CREATE TABLE IF NOT EXISTS `saida_produtos` (
   `processado` tinyint DEFAULT '0',
   `venda_id` int NOT NULL,
   PRIMARY KEY (`id_saida`)
-) ENGINE=MyISAM AUTO_INCREMENT=132 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=134 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `saida_produtos`
@@ -675,7 +688,9 @@ INSERT INTO `saida_produtos` (`id_saida`, `id_produto`, `quantidade`, `data`, `p
 (128, 24, 7, '2025-11-24', 1, 54),
 (129, 6, 1, '2025-11-24', 1, 55),
 (130, 30, 1, '2025-11-24', 1, 55),
-(131, 19, 1, '2025-11-24', 1, 56);
+(131, 19, 1, '2025-11-24', 1, 56),
+(132, 28, 1, '2025-12-14', 1, 57),
+(133, 35, 1, '2025-12-15', 1, 58);
 
 -- --------------------------------------------------------
 
@@ -690,6 +705,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `nome_usuario` varchar(100) NOT NULL,
   `senha` varchar(300) NOT NULL,
   `id_estabelecimento` int NOT NULL,
+  `ativo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id_usuario`),
   KEY `fk_usuario_estabelecimento` (`id_estabelecimento`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -698,10 +714,10 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 -- Despejando dados para a tabela `usuarios`
 --
 
-INSERT INTO `usuarios` (`id_usuario`, `tipo_usuario`, `nome_usuario`, `senha`, `id_estabelecimento`) VALUES
-(1, 1, 'Admin', '$2y$10$DoNr2lUkCJrcGq0AGxPeo.cCQfW/1CYTDfQsCzBoMtWunu.j4soWS', 2),
-(2, 0, 'Vendedor', '$2y$10$pY6ohWt210gUuJ2iet/hSOBW8Iv80mpL7vWZnytbDz/jCjqpufYTS', 1),
-(6, 0, 'Vendedor2', '$2y$10$x77gvMlzOjlDdmTGExNz3.t7BwRQhfc4aL5Joop.eK5yb8LpjRu0y', 2);
+INSERT INTO `usuarios` (`id_usuario`, `tipo_usuario`, `nome_usuario`, `senha`, `id_estabelecimento`, `ativo`) VALUES
+(1, 1, 'Admin', '$2y$10$DoNr2lUkCJrcGq0AGxPeo.cCQfW/1CYTDfQsCzBoMtWunu.j4soWS', 2, 1),
+(2, 0, 'Vendedor', '$2y$10$pY6ohWt210gUuJ2iet/hSOBW8Iv80mpL7vWZnytbDz/jCjqpufYTS', 1, 1),
+(6, 0, 'Vendedor2', '$2y$10$x77gvMlzOjlDdmTGExNz3.t7BwRQhfc4aL5Joop.eK5yb8LpjRu0y', 2, 0);
 
 -- --------------------------------------------------------
 
@@ -721,7 +737,7 @@ CREATE TABLE IF NOT EXISTS `vendas` (
   PRIMARY KEY (`id_venda`),
   KEY `fk_venda_pagamento` (`id_forma_pagamento`),
   KEY `idx_fechamento_caixa` (`fechamento_caixa_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `vendas`
@@ -783,7 +799,10 @@ INSERT INTO `vendas` (`id_venda`, `data_hora`, `valor_total`, `id_forma_pagament
 (53, '2025-11-24 01:10:41', 126.00, 2, 'finalizada', 10, ''),
 (54, '2025-11-24 01:10:49', 17.50, 1, 'finalizada', 10, ''),
 (55, '2025-11-24 01:10:55', 76.00, 3, 'finalizada', 10, ''),
-(56, '2025-11-24 01:11:01', 3.00, 1, 'finalizada', 10, '');
+(56, '2025-11-24 01:11:01', 3.00, 1, 'finalizada', 10, ''),
+(57, '2025-12-14 17:02:32', 75.00, 1, 'finalizada', 11, ''),
+(58, '2025-12-15 16:14:14', 65.00, 4, 'finalizada', NULL, ''),
+(59, '2025-12-15 16:44:46', 100.00, 4, 'finalizada', NULL, '');
 
 --
 -- Restrições para tabelas despejadas

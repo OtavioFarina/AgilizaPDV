@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "banco";
+$dbname = "agilizapdvbd";
 
 try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname;charset=UTF8", $username, $password);

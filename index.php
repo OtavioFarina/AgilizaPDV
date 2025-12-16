@@ -1,5 +1,5 @@
 <?php
-require_once "conexao.php";
+require_once "config/conexao.php";
 
 $lojas = [];
 
@@ -23,14 +23,20 @@ try {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles/style_login.css">
+  <link rel="stylesheet" href="assets/css/style_login.css">
 </head>
 
 <body>
+  <script>
+    // Force reset to Light Mode on Login screen (as requested)
+    localStorage.removeItem('theme');
+    // Optional: If you want to force apply light mode immediately to avoid flash if the login page itself has dark mode styles
+    document.documentElement.setAttribute('data-theme', 'light');
+  </script>
 
   <div class="login-card">
     <div class="login-header">
-      <img src="img/logoagilizasemfundo.png" alt="Logo Agiliza" class="login-logo">
+      <img src="assets/img/logoagilizasemfundo.png" alt="Logo Agiliza PDV" class="login-logo">
       <h1 class="login-title">Bem-vindo!</h1>
       <p class="login-subtitle">Insira suas credenciais para acessar</p>
     </div>

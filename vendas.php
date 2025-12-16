@@ -10,22 +10,30 @@ if (!isset($_SESSION['nome_usuario']) || !isset($_SESSION['id_estabelecimento'])
 // Define tipo de usuário (evita erro se não existir)
 $tipo_usuario = isset($_SESSION['tipo_usuario']) ? $_SESSION['tipo_usuario'] : 0;
 
-include "conexao.php";
+require_once "config/conexao.php";
 
 $sqlStatus = "SELECT status FROM caixa_status ORDER BY id_status DESC LIMIT 1";
 $stmtStatus = $conn->prepare($sqlStatus);
 $stmtStatus->execute();
 $caixa_status = $stmtStatus->fetchColumn();
 
-$sqlCat = "SELECT * FROM categoria ORDER BY nome_categoria ASC";
+// --- CORREÇÃO 1: Filtrar apenas Categorias Ativas ---
+$sqlCat = "SELECT * FROM categoria WHERE ativo = 1 ORDER BY nome_categoria ASC";
 $stmtCat = $conn->prepare($sqlCat);
 $stmtCat->execute();
 $categorias = $stmtCat->fetchAll(PDO::FETCH_ASSOC);
 
-$sqlProd = "SELECT p.*, c.id_categoria AS cat_id, c.nome_categoria FROM produto p LEFT JOIN categoria c ON p.id_categoria = c.id_categoria ORDER BY c.nome_categoria, p.nome";
+// --- CORREÇÃO 2: Filtrar apenas Produtos Ativos E de Categorias Ativas ---
+$sqlProd = "SELECT p.*, c.id_categoria AS cat_id, c.nome_categoria 
+            FROM produto p 
+            LEFT JOIN categoria c ON p.id_categoria = c.id_categoria 
+            WHERE p.ativo = 1 AND c.ativo = 1 
+            ORDER BY c.nome_categoria, p.nome";
+
 $stmtProd = $conn->prepare($sqlProd);
 $stmtProd->execute();
 $produtos = $stmtProd->fetchAll(PDO::FETCH_ASSOC);
+
 $produtos_por_categoria = [];
 foreach ($produtos as $p) {
     $catKey = $p['cat_id'] ?? 0;
@@ -45,13 +53,14 @@ foreach ($produtos as $p) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="styles/style_vendas.css">
+    <link rel="stylesheet" href="assets/css/style_vendas.css">
+    <link href="assets/css/dark_mode.css" rel="stylesheet">
 </head>
 
 <body>
     <header class="pdv-header">
         <div class="d-flex align-items-center gap-3">
-            <img src="img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
+            <img src="assets/img/logoagilizasemfundo.png" class="logo" alt="Logo PDV">
             <h4 class="m-0 fw-bold text-secondary d-none d-md-block">Ponto de Venda</h4>
         </div>
 
@@ -65,7 +74,6 @@ foreach ($produtos as $p) {
             <?php else: ?>
                 <span class="badge bg-danger caixa-badge"><i class='bx bxs-lock-alt'></i> Caixa Fechado</span>
             <?php endif; ?>
-
             <div class="dropdown">
                 <button class="btn btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown">
                     <i class='bx bx-menu fs-3'></i>
@@ -87,6 +95,15 @@ foreach ($produtos as $p) {
                             data-bs-target="#exampleModalToggle"><i class='bx bx-toggle-left'></i> Abrir/Fechar
                             Caixa</a></li>
                     <li><a class="dropdown-item py-2" href="estoque.php"><i class='bx bx-box'></i> Estoque</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item py-2 text-primary fw-bold" data-bs-toggle="modal"
+                            data-bs-target="#settingsModal">
+                            <i class='bx bx-cog'></i> Configurações
+                        </button>
+                    </li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -128,7 +145,7 @@ foreach ($produtos as $p) {
                             <ul id="carrinhoLista" class="list-group list-group-flush">
                             </ul>
                             <div id="emptyCartMsg" class="text-center text-muted mt-5" style="display:none;">
-                                <i class='bx bx-basket fs-1 opacity-25'></i>
+                                <img src="assets/img/produtosemfoto.png" alt="Sem Foto">
                                 <p class="mt-2 small">Seu carrinho está vazio.</p>
                             </div>
                         </div>
@@ -666,6 +683,32 @@ foreach ($produtos as $p) {
             });
         }
     </script>
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class='bx bx-cog'></i> Configurações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0 fw-bold">Modo Escuro</h6>
+                            <small class="text-muted">Alternar entre tema claro e escuro</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="themeToggle"
+                                style="width: 3em; height: 1.5em; cursor: pointer;">
+                            <label class="form-check-label ms-2" for="themeToggle"><i id="themeIcon"
+                                    class="bx bx-sun fs-4 text-warning"></i></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/settings.js"></script>
 </body>
 
 </html>
