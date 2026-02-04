@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 5.2.1deb3
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Tempo de geração: 15/12/2025 às 20:17
--- Versão do servidor: 8.4.7
--- Versão do PHP: 8.3.28
+-- Host: localhost:3306
+-- Tempo de geração: 05/01/2026 às 20:27
+-- Versão do servidor: 8.0.44-0ubuntu0.24.04.2
+-- Versão do PHP: 8.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,14 +29,12 @@ USE `agilizapdvbd`;
 -- Estrutura para tabela `caixa_status`
 --
 
-DROP TABLE IF EXISTS `caixa_status`;
-CREATE TABLE IF NOT EXISTS `caixa_status` (
-  `id_status` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `caixa_status` (
+  `id_status` int NOT NULL,
   `status` enum('aberto','fechado') NOT NULL DEFAULT 'fechado',
   `valor_inicial` decimal(10,2) DEFAULT '0.00',
-  `data_status` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_status`)
-) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `data_status` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `caixa_status`
@@ -73,13 +71,11 @@ INSERT INTO `caixa_status` (`id_status`, `status`, `valor_inicial`, `data_status
 -- Estrutura para tabela `categoria`
 --
 
-DROP TABLE IF EXISTS `categoria`;
-CREATE TABLE IF NOT EXISTS `categoria` (
-  `id_categoria` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `categoria` (
+  `id_categoria` int NOT NULL,
   `nome_categoria` varchar(100) NOT NULL,
-  `ativo` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id_categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `ativo` tinyint(1) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `categoria`
@@ -106,18 +102,16 @@ INSERT INTO `categoria` (`id_categoria`, `nome_categoria`, `ativo`) VALUES
 -- Estrutura para tabela `estabelecimento`
 --
 
-DROP TABLE IF EXISTS `estabelecimento`;
-CREATE TABLE IF NOT EXISTS `estabelecimento` (
-  `id_estabelecimento` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `estabelecimento` (
+  `id_estabelecimento` int NOT NULL,
   `nome_estabelecimento` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `cep` varchar(255) NOT NULL,
   `rua` varchar(255) NOT NULL,
   `bairro` varchar(255) NOT NULL,
   `cidade` varchar(120) NOT NULL,
   `estado` char(2) NOT NULL,
-  `ativo` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id_estabelecimento`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `ativo` tinyint(1) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `estabelecimento`
@@ -133,18 +127,16 @@ INSERT INTO `estabelecimento` (`id_estabelecimento`, `nome_estabelecimento`, `ce
 -- Estrutura para tabela `estoque`
 --
 
-DROP TABLE IF EXISTS `estoque`;
-CREATE TABLE IF NOT EXISTS `estoque` (
-  `id_estoque` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `estoque` (
+  `id_estoque` int NOT NULL,
   `produto` varchar(255) NOT NULL,
   `sabor` varchar(255) NOT NULL,
   `tipo` varchar(50) NOT NULL,
   `estoque_atual` int NOT NULL,
   `data` datetime NOT NULL,
   `movimentacao` enum('Entrada','Saída') NOT NULL,
-  `valor_custo` decimal(10,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`id_estoque`)
-) ENGINE=MyISAM AUTO_INCREMENT=241 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `valor_custo` decimal(10,2) NOT NULL DEFAULT '0.00'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `estoque`
@@ -391,9 +383,8 @@ INSERT INTO `estoque` (`id_estoque`, `produto`, `sabor`, `tipo`, `estoque_atual`
 -- Estrutura para tabela `fechamento_caixa`
 --
 
-DROP TABLE IF EXISTS `fechamento_caixa`;
-CREATE TABLE IF NOT EXISTS `fechamento_caixa` (
-  `id_fechamento` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `fechamento_caixa` (
+  `id_fechamento` int NOT NULL,
   `data_abertura` datetime DEFAULT NULL,
   `data_fechamento` datetime DEFAULT NULL,
   `operador` varchar(50) DEFAULT NULL,
@@ -402,9 +393,8 @@ CREATE TABLE IF NOT EXISTS `fechamento_caixa` (
   `total_cartaoC` decimal(10,2) DEFAULT '0.00',
   `total_cartaoD` decimal(10,2) DEFAULT '0.00',
   `total_pix` decimal(10,2) DEFAULT '0.00',
-  `valor_final_informado` decimal(10,2) DEFAULT '0.00',
-  PRIMARY KEY (`id_fechamento`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `valor_final_informado` decimal(10,2) DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `fechamento_caixa`
@@ -429,13 +419,10 @@ INSERT INTO `fechamento_caixa` (`id_fechamento`, `data_abertura`, `data_fechamen
 -- Estrutura para tabela `forma_pagamento`
 --
 
-DROP TABLE IF EXISTS `forma_pagamento`;
-CREATE TABLE IF NOT EXISTS `forma_pagamento` (
-  `id_forma_pagamento` int NOT NULL AUTO_INCREMENT,
-  `nome_pagamento` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_forma_pagamento`),
-  UNIQUE KEY `nome_pagamento` (`nome_pagamento`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `forma_pagamento` (
+  `id_forma_pagamento` int NOT NULL,
+  `nome_pagamento` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `forma_pagamento`
@@ -453,17 +440,15 @@ INSERT INTO `forma_pagamento` (`id_forma_pagamento`, `nome_pagamento`) VALUES
 -- Estrutura para tabela `fornecedor`
 --
 
-DROP TABLE IF EXISTS `fornecedor`;
-CREATE TABLE IF NOT EXISTS `fornecedor` (
-  `id_fornecedor` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `fornecedor` (
+  `id_fornecedor` int NOT NULL,
   `nome_fornecedor` varchar(120) NOT NULL,
   `cnpj` varchar(255) NOT NULL,
   `telefone` varchar(20) DEFAULT NULL,
   `email` varchar(120) DEFAULT NULL,
   `endereco` varchar(200) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id_fornecedor`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `ativo` tinyint(1) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `fornecedor`
@@ -480,20 +465,16 @@ INSERT INTO `fornecedor` (`id_fornecedor`, `nome_fornecedor`, `cnpj`, `telefone`
 -- Estrutura para tabela `produto`
 --
 
-DROP TABLE IF EXISTS `produto`;
-CREATE TABLE IF NOT EXISTS `produto` (
-  `id_produto` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `produto` (
+  `id_produto` int NOT NULL,
   `nome` varchar(50) NOT NULL,
   `sabor` varchar(50) NOT NULL,
   `id_categoria` int NOT NULL,
   `id_fornecedor` int NOT NULL,
   `preco_venda` decimal(10,2) NOT NULL,
   `preco_compra` decimal(10,2) NOT NULL,
-  `ativo` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id_produto`),
-  KEY `id_categoria` (`id_categoria`),
-  KEY `id_fornecedor` (`id_fornecedor`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `ativo` tinyint(1) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `produto`
@@ -542,16 +523,14 @@ INSERT INTO `produto` (`id_produto`, `nome`, `sabor`, `id_categoria`, `id_fornec
 -- Estrutura para tabela `saida_produtos`
 --
 
-DROP TABLE IF EXISTS `saida_produtos`;
-CREATE TABLE IF NOT EXISTS `saida_produtos` (
-  `id_saida` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `saida_produtos` (
+  `id_saida` int NOT NULL,
   `id_produto` int NOT NULL,
   `quantidade` int DEFAULT NULL,
   `data` date DEFAULT NULL,
   `processado` tinyint DEFAULT '0',
-  `venda_id` int NOT NULL,
-  PRIMARY KEY (`id_saida`)
-) ENGINE=MyISAM AUTO_INCREMENT=134 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `venda_id` int NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `saida_produtos`
@@ -698,17 +677,14 @@ INSERT INTO `saida_produtos` (`id_saida`, `id_produto`, `quantidade`, `data`, `p
 -- Estrutura para tabela `usuarios`
 --
 
-DROP TABLE IF EXISTS `usuarios`;
-CREATE TABLE IF NOT EXISTS `usuarios` (
-  `id_usuario` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `usuarios` (
+  `id_usuario` int NOT NULL,
   `tipo_usuario` int NOT NULL,
   `nome_usuario` varchar(100) NOT NULL,
   `senha` varchar(300) NOT NULL,
   `id_estabelecimento` int NOT NULL,
-  `ativo` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id_usuario`),
-  KEY `fk_usuario_estabelecimento` (`id_estabelecimento`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `ativo` tinyint(1) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `usuarios`
@@ -725,19 +701,15 @@ INSERT INTO `usuarios` (`id_usuario`, `tipo_usuario`, `nome_usuario`, `senha`, `
 -- Estrutura para tabela `vendas`
 --
 
-DROP TABLE IF EXISTS `vendas`;
-CREATE TABLE IF NOT EXISTS `vendas` (
-  `id_venda` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `vendas` (
+  `id_venda` int NOT NULL,
   `data_hora` datetime NOT NULL,
   `valor_total` decimal(10,2) NOT NULL,
   `id_forma_pagamento` int DEFAULT NULL,
   `status` varchar(20) DEFAULT 'pendente',
   `fechamento_caixa_id` int DEFAULT NULL,
-  `cliente` varchar(100) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id_venda`),
-  KEY `fk_venda_pagamento` (`id_forma_pagamento`),
-  KEY `idx_fechamento_caixa` (`fechamento_caixa_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `cliente` varchar(100) NOT NULL DEFAULT ''
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `vendas`
@@ -803,6 +775,152 @@ INSERT INTO `vendas` (`id_venda`, `data_hora`, `valor_total`, `id_forma_pagament
 (57, '2025-12-14 17:02:32', 75.00, 1, 'finalizada', 11, ''),
 (58, '2025-12-15 16:14:14', 65.00, 4, 'finalizada', NULL, ''),
 (59, '2025-12-15 16:44:46', 100.00, 4, 'finalizada', NULL, '');
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `caixa_status`
+--
+ALTER TABLE `caixa_status`
+  ADD PRIMARY KEY (`id_status`);
+
+--
+-- Índices de tabela `categoria`
+--
+ALTER TABLE `categoria`
+  ADD PRIMARY KEY (`id_categoria`);
+
+--
+-- Índices de tabela `estabelecimento`
+--
+ALTER TABLE `estabelecimento`
+  ADD PRIMARY KEY (`id_estabelecimento`);
+
+--
+-- Índices de tabela `estoque`
+--
+ALTER TABLE `estoque`
+  ADD PRIMARY KEY (`id_estoque`);
+
+--
+-- Índices de tabela `fechamento_caixa`
+--
+ALTER TABLE `fechamento_caixa`
+  ADD PRIMARY KEY (`id_fechamento`);
+
+--
+-- Índices de tabela `forma_pagamento`
+--
+ALTER TABLE `forma_pagamento`
+  ADD PRIMARY KEY (`id_forma_pagamento`),
+  ADD UNIQUE KEY `nome_pagamento` (`nome_pagamento`);
+
+--
+-- Índices de tabela `fornecedor`
+--
+ALTER TABLE `fornecedor`
+  ADD PRIMARY KEY (`id_fornecedor`);
+
+--
+-- Índices de tabela `produto`
+--
+ALTER TABLE `produto`
+  ADD PRIMARY KEY (`id_produto`),
+  ADD KEY `id_categoria` (`id_categoria`),
+  ADD KEY `id_fornecedor` (`id_fornecedor`);
+
+--
+-- Índices de tabela `saida_produtos`
+--
+ALTER TABLE `saida_produtos`
+  ADD PRIMARY KEY (`id_saida`);
+
+--
+-- Índices de tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id_usuario`),
+  ADD KEY `fk_usuario_estabelecimento` (`id_estabelecimento`);
+
+--
+-- Índices de tabela `vendas`
+--
+ALTER TABLE `vendas`
+  ADD PRIMARY KEY (`id_venda`),
+  ADD KEY `fk_venda_pagamento` (`id_forma_pagamento`),
+  ADD KEY `idx_fechamento_caixa` (`fechamento_caixa_id`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `caixa_status`
+--
+ALTER TABLE `caixa_status`
+  MODIFY `id_status` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT de tabela `categoria`
+--
+ALTER TABLE `categoria`
+  MODIFY `id_categoria` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT de tabela `estabelecimento`
+--
+ALTER TABLE `estabelecimento`
+  MODIFY `id_estabelecimento` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `estoque`
+--
+ALTER TABLE `estoque`
+  MODIFY `id_estoque` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=241;
+
+--
+-- AUTO_INCREMENT de tabela `fechamento_caixa`
+--
+ALTER TABLE `fechamento_caixa`
+  MODIFY `id_fechamento` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de tabela `forma_pagamento`
+--
+ALTER TABLE `forma_pagamento`
+  MODIFY `id_forma_pagamento` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de tabela `fornecedor`
+--
+ALTER TABLE `fornecedor`
+  MODIFY `id_fornecedor` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de tabela `produto`
+--
+ALTER TABLE `produto`
+  MODIFY `id_produto` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT de tabela `saida_produtos`
+--
+ALTER TABLE `saida_produtos`
+  MODIFY `id_saida` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id_usuario` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de tabela `vendas`
+--
+ALTER TABLE `vendas`
+  MODIFY `id_venda` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- Restrições para tabelas despejadas
